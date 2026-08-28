@@ -12,6 +12,10 @@
   --accent-soft: rgba(13, 148, 136, 0.12);
   --amber: #f2c94c;
   --amber-soft: rgba(242, 201, 76, 0.18);
+  --rose: #9b6b8e;
+  --rose-soft: rgba(155, 107, 142, 0.14);
+  --sage: #7c9c8f;
+  --sage-soft: rgba(124, 156, 143, 0.18);
 
   --income: #1a7a4c;
   --expense: #b8462f;
@@ -54,6 +58,10 @@
     --accent-soft: rgba(45, 212, 194, 0.14);
     --amber: #f2c94c;
     --amber-soft: rgba(242, 201, 76, 0.14);
+    --rose: #c98fb8;
+    --rose-soft: rgba(201, 143, 184, 0.14);
+    --sage: #9fc2b0;
+    --sage-soft: rgba(159, 194, 176, 0.14);
 
     --income: #4ade80;
     --expense: #f87171;

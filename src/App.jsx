@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import BudgetPage from './pages/BudgetPage';
+import GoalsPage from './pages/GoalsPage';
+import NotesPage from './pages/NotesPage';
 import ScrumBoard from './pages/ScrumBoard';
 import './App.css';
 
@@ -23,6 +25,27 @@ const TABS = [
         <rect x="2.5" y="5" width="15" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
         <path d="M2.5 8.5H17.5" stroke="currentColor" strokeWidth="1.5" />
         <circle cx="14" cy="12.5" r="1.4" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    id: 'notes',
+    label: 'Notes',
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3.5" y="2.5" width="13" height="15" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M6.5 7H13.5M6.5 10.5H13.5M6.5 14H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    id: 'goals',
+    label: 'Goals',
+    icon: (
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5" />
+        <circle cx="10" cy="10" r="3.6" stroke="currentColor" strokeWidth="1.5" />
+        <circle cx="10" cy="10" r="1" fill="currentColor" />
       </svg>
     ),
   },
@@ -65,7 +88,10 @@ function App() {
       </aside>
 
       <main className="app-main">
-        {activeTab === 'budget' ? <BudgetPage /> : <ScrumBoard />}
+        {activeTab === 'budget' && <BudgetPage />}
+        {activeTab === 'notes' && <NotesPage />}
+        {activeTab === 'goals' && <GoalsPage />}
+        {activeTab === 'scrum' && <ScrumBoard />}
       </main>
     </div>
   );

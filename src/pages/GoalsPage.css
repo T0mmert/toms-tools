@@ -1,0 +1,144 @@
+.goal-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.goal-form input {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  transition: border-color 0.15s;
+}
+
+.goal-form input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.goal-form input[type='text']:first-child {
+  flex: 2;
+  min-width: 220px;
+}
+
+.goal-form input[type='number'] {
+  width: 130px;
+}
+
+.goal-form input[type='text']:last-of-type {
+  width: 110px;
+}
+
+.goal-form button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 9px;
+  background: var(--ink);
+  color: var(--surface);
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.goal-form button:hover {
+  opacity: 0.85;
+}
+
+.goals-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.goal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.2s;
+}
+
+.goal-card.complete {
+  border-left-color: var(--income);
+}
+
+.goal-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.goal-top h3 {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.goal-bar-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  overflow: hidden;
+}
+
+.goal-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+
+.goal-card.complete .goal-bar-fill {
+  background: var(--income);
+}
+
+.goal-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.goal-values {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.goal-values input {
+  width: 72px;
+  padding: 5px 7px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-alt);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 13.5px;
+}
+
+.goal-values input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.goal-pct {
+  font-family: var(--serif);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.goal-card.complete .goal-pct {
+  color: var(--income);
+}

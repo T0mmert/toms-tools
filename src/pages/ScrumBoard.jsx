@@ -25,9 +25,57 @@ const COLUMN_ACCENTS = {
   done: '#1a7a4c',
 };
 
+const IDLE_TIMER = { cardId: null, startedAt: null };
+
+function formatDuration(totalSeconds) {
+  const s = Math.max(0, Math.round(totalSeconds));
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  if (h > 0) return `${h}u ${String(m).padStart(2, '0')}m`;
+  if (m > 0) return `${m}m ${String(sec).padStart(2, '0')}s`;
+  return `${sec}s`;
+}
+
+function CardTimer({ trackedSeconds, isRunning, startedAt, onToggle }) {
+  const [, forceTick] = useState(0);
+
+  useEffect(() => {
+    if (!isRunning) return undefined;
+    const id = setInterval(() => forceTick((n) => n + 1), 1000);
+    return () => clearInterval(id);
+  }, [isRunning]);
+
+  const liveSeconds = trackedSeconds + (isRunning && startedAt ? (Date.now() - startedAt) / 1000 : 0);
+
+  return (
+    <div className={`card-timer${isRunning ? ' running' : ''}`}>
+      <button
+        type="button"
+        className="timer-toggle"
+        onClick={onToggle}
+        aria-label={isRunning ? 'Pauzeer timer' : 'Start timer'}
+      >
+        {isRunning ? (
+          <svg viewBox="0 0 12 12" fill="currentColor">
+            <rect x="2" y="1.5" width="3" height="9" rx="1" />
+            <rect x="7" y="1.5" width="3" height="9" rx="1" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 12 12" fill="currentColor">
+            <path d="M3 1.7a.7.7 0 0 1 1.06-.6l6 4.3a.7.7 0 0 1 0 1.2l-6 4.3A.7.7 0 0 1 3 10.3z" />
+          </svg>
+        )}
+      </button>
+      <span className="timer-value">{formatDuration(liveSeconds)}</span>
+    </div>
+  );
+}
+
 function ScrumBoard() {
   const [board, setBoard] = useLocalStorage('toms-tools:scrum-board', INITIAL_BOARD);
   const [history, setHistory] = useLocalStorage('toms-tools:scrum-history', []);
+  const [activeTimer, setActiveTimer] = useLocalStorage('toms-tools:timer', IDLE_TIMER);
   const [newCard, setNewCard] = useState({ title: '', hours: '' });
 
   const remainingHours = useMemo(() => {
@@ -58,7 +106,7 @@ function ScrumBoard() {
     const id = uuid();
     setBoard((prev) => ({
       ...prev,
-      cards: { ...prev.cards, [id]: { id, title: newCard.title.trim(), hours } },
+      cards: { ...prev.cards, [id]: { id, title: newCard.title.trim(), hours, trackedSeconds: 0 } },
       columns: {
         ...prev.columns,
         backlog: { ...prev.columns.backlog, cardIds: [...prev.columns.backlog.cardIds, id] },
@@ -67,7 +115,33 @@ function ScrumBoard() {
     setNewCard({ title: '', hours: '' });
   }
 
+  function commitElapsed(cardId, startedAt, now) {
+    if (!cardId || !startedAt) return;
+    const elapsed = (now - startedAt) / 1000;
+    setBoard((prev) => ({
+      ...prev,
+      cards: {
+        ...prev.cards,
+        [cardId]: { ...prev.cards[cardId], trackedSeconds: (prev.cards[cardId]?.trackedSeconds || 0) + elapsed },
+      },
+    }));
+  }
+
+  function toggleTimer(cardId) {
+    const now = Date.now();
+    if (activeTimer.cardId === cardId) {
+      commitElapsed(cardId, activeTimer.startedAt, now);
+      setActiveTimer(IDLE_TIMER);
+      return;
+    }
+    if (activeTimer.cardId) {
+      commitElapsed(activeTimer.cardId, activeTimer.startedAt, now);
+    }
+    setActiveTimer({ cardId, startedAt: now });
+  }
+
   function removeCard(cardId, columnId) {
+    setActiveTimer((prev) => (prev.cardId === cardId ? IDLE_TIMER : prev));
     setBoard((prev) => {
       const nextCards = { ...prev.cards };
       delete nextCards[cardId];
@@ -196,6 +270,12 @@ function ScrumBoard() {
                                     ×
                                   </button>
                                 </div>
+                                <CardTimer
+                                  trackedSeconds={card.trackedSeconds || 0}
+                                  isRunning={activeTimer.cardId === card.id}
+                                  startedAt={activeTimer.cardId === card.id ? activeTimer.startedAt : null}
+                                  onToggle={() => toggleTimer(card.id)}
+                                />
                               </div>
                             )}
                           </Draggable>
