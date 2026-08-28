@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { v4 as uuid } from 'uuid';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import './ScrumBoard.css';
@@ -17,6 +17,13 @@ const INITIAL_BOARD = {
 };
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
+
+const COLUMN_ACCENTS = {
+  backlog: '#8f8a79',
+  todo: '#f2c94c',
+  inprogress: '#0d9488',
+  done: '#1a7a4c',
+};
 
 function ScrumBoard() {
   const [board, setBoard] = useLocalStorage('toms-tools:scrum-board', INITIAL_BOARD);
@@ -111,6 +118,11 @@ function ScrumBoard() {
 
   return (
     <div className="scrum-page">
+      <div className="page-header">
+        <span className="page-eyebrow">Sprint</span>
+        <h1>Scrum Board</h1>
+      </div>
+
       <form className="add-card-form" onSubmit={handleAddCard}>
         <input
           type="text"
@@ -137,8 +149,9 @@ function ScrumBoard() {
             const column = board.columns[colId];
             const colHours = column.cardIds.reduce((s, cardId) => s + (board.cards[cardId]?.hours || 0), 0);
             return (
-              <div className="column" key={column.id}>
+              <div className="column" key={column.id} style={{ '--column-accent': COLUMN_ACCENTS[column.id] }}>
                 <div className="column-header">
+                  <span className="column-dot" />
                   <h3>{column.title}</h3>
                   <span className="column-hours">{colHours}u</span>
                 </div>
@@ -161,7 +174,17 @@ function ScrumBoard() {
                                 {...dragProvided.draggableProps}
                                 {...dragProvided.dragHandleProps}
                               >
-                                <span className="card-title">{card.title}</span>
+                                <div className="card-top">
+                                  <span className="card-title">{card.title}</span>
+                                  <svg className="grip" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="2.5" cy="2.5" r="1.4" fill="currentColor" />
+                                    <circle cx="7.5" cy="2.5" r="1.4" fill="currentColor" />
+                                    <circle cx="2.5" cy="8" r="1.4" fill="currentColor" />
+                                    <circle cx="7.5" cy="8" r="1.4" fill="currentColor" />
+                                    <circle cx="2.5" cy="13.5" r="1.4" fill="currentColor" />
+                                    <circle cx="7.5" cy="13.5" r="1.4" fill="currentColor" />
+                                  </svg>
+                                </div>
                                 <div className="card-footer">
                                   <span className="card-hours">{card.hours}u</span>
                                   <button
@@ -194,13 +217,25 @@ function ScrumBoard() {
           <p className="empty-state">Nog niet genoeg data — kom morgen terug voor de trend.</p>
         ) : (
           <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="date" stroke="var(--text)" />
-              <YAxis stroke="var(--text)" label={{ value: 'Uren', angle: -90, position: 'insideLeft' }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="hours" stroke="var(--accent)" strokeWidth={2} dot />
-            </LineChart>
+            <AreaChart data={chartData}>
+              <defs>
+                <linearGradient id="backlogFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#0d9488" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#0d9488" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="date" stroke="var(--text-dim)" tick={{ fontSize: 12 }} tickLine={false} axisLine={{ stroke: 'var(--border)' }} />
+              <YAxis
+                stroke="var(--text-dim)"
+                tick={{ fontSize: 12 }}
+                tickLine={false}
+                axisLine={false}
+                label={{ value: 'Uren', angle: -90, position: 'insideLeft', fill: 'var(--text-dim)', fontSize: 12 }}
+              />
+              <Tooltip contentStyle={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 13 }} />
+              <Area type="monotone" dataKey="hours" stroke="#0d9488" strokeWidth={2.5} fill="url(#backlogFill)" dot={{ r: 3.5, fill: '#0d9488', strokeWidth: 0 }} />
+            </AreaChart>
           </ResponsiveContainer>
         )}
       </div>

@@ -2,29 +2,61 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .summary-card {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 20px;
-  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 18px 20px 18px 24px;
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.summary-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--border);
+}
+
+.summary-card.income::before {
+  background: var(--income);
+}
+
+.summary-card.expense::before {
+  background: var(--expense);
+}
+
+.summary-card.balance.positive::before {
+  background: var(--accent);
+}
+
+.summary-card.balance.negative::before {
+  background: var(--expense);
 }
 
 .summary-label {
-  font-size: 13px;
-  opacity: 0.7;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .summary-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-h);
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink);
 }
 
 .summary-card.income .summary-value {
@@ -39,14 +71,10 @@
   color: var(--expense);
 }
 
-.summary-card.balance.positive .summary-value {
-  color: var(--income);
-}
-
 .budget-body {
   display: grid;
   grid-template-columns: 320px 1fr;
-  gap: 24px;
+  gap: 20px;
   align-items: start;
 }
 
@@ -67,15 +95,18 @@
 .entry-list {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
 }
 
 .entry-form h2,
 .category-chart h2,
 .entry-list h2 {
-  font-size: 16px;
+  font-size: 15.5px;
+  font-family: var(--sans);
+  font-weight: 600;
+  color: var(--ink);
   margin: 0 0 16px;
 }
 
@@ -88,9 +119,16 @@
 .entry-form input {
   padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg);
-  color: var(--text-h);
+  border-radius: 9px;
+  background: var(--surface-alt);
+  color: var(--ink);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.entry-form input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
 }
 
 .type-toggle {
@@ -106,45 +144,57 @@
   gap: 6px;
   padding: 8px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-dim);
   cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 
 .type-toggle label.active {
   border-color: var(--accent);
-  background: var(--accent-bg);
-  color: var(--text-h);
+  background: var(--accent-soft);
+  color: var(--ink);
 }
 
 .entry-form button {
   margin-top: 4px;
-  padding: 10px;
+  padding: 11px;
   border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: white;
+  border-radius: 9px;
+  background: var(--ink);
+  color: var(--surface);
   font-weight: 600;
+  font-size: 14px;
+  transition: opacity 0.15s;
+}
+
+.entry-form button:hover {
+  opacity: 0.85;
 }
 
 .entry-list table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 13.5px;
 }
 
 .entry-list th {
   text-align: left;
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
-  opacity: 0.6;
-  padding: 0 8px 8px;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  padding: 0 8px 10px;
   border-bottom: 1px solid var(--border);
 }
 
 .entry-list td {
-  padding: 10px 8px;
+  padding: 11px 8px;
   border-bottom: 1px solid var(--border);
+  color: var(--text);
 }
 
 .entry-list tr:last-child td {
@@ -152,8 +202,10 @@
 }
 
 .entry-list .amount {
+  font-family: var(--serif);
   font-weight: 600;
   white-space: nowrap;
+  color: var(--ink);
 }
 
 .entry-list tr.income .amount {
@@ -167,16 +219,15 @@
 .remove-btn {
   border: none;
   background: transparent;
-  color: var(--text);
-  opacity: 0.5;
+  color: var(--text-dim);
   font-size: 16px;
   line-height: 1;
   padding: 4px 8px;
   border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
 }
 
 .remove-btn:hover {
-  opacity: 1;
-  background: var(--accent-bg);
   color: var(--expense);
+  background: var(--accent-soft);
 }

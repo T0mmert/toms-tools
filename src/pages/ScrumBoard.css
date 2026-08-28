@@ -1,16 +1,22 @@
 .add-card-form {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
 }
 
 .add-card-form input {
   padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 9px;
   background: var(--surface);
-  color: var(--text-h);
+  color: var(--ink);
+  transition: border-color 0.15s;
+}
+
+.add-card-form input:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 .add-card-form input[type='text'] {
@@ -25,11 +31,17 @@
 .add-card-form button {
   padding: 10px 18px;
   border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: white;
+  border-radius: 9px;
+  background: var(--ink);
+  color: var(--surface);
   font-weight: 600;
+  font-size: 14px;
   white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.add-card-form button:hover {
+  opacity: 0.85;
 }
 
 .board {
@@ -49,33 +61,46 @@
 .column {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
+  border-top: 3px solid var(--column-accent, var(--border));
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  min-height: 320px;
+  min-height: 340px;
 }
 
 .column-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px 10px;
+  gap: 8px;
+  padding: 14px 16px 12px;
   border-bottom: 1px solid var(--border);
 }
 
+.column-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--column-accent, var(--text-dim));
+  flex-shrink: 0;
+}
+
 .column-header h3 {
-  font-size: 14px;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 600;
   margin: 0;
+  flex: 1;
 }
 
 .column-hours {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
-  color: var(--accent);
-  background: var(--accent-bg);
-  padding: 2px 8px;
+  color: var(--text-dim);
+  background: var(--surface-alt);
+  padding: 2px 9px;
   border-radius: 999px;
+  font-variant-numeric: tabular-nums;
 }
 
 .card-list {
@@ -89,30 +114,55 @@
 }
 
 .card-list.dragging-over {
-  background: var(--accent-bg);
+  background: var(--accent-soft);
+  border-radius: 0 0 var(--radius) var(--radius);
 }
 
 .card {
-  background: var(--bg);
+  background: var(--surface-alt);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
+  border-left: 3px solid var(--column-accent, var(--border));
+  border-radius: 9px;
+  padding: 11px 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   cursor: grab;
   user-select: none;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .card.dragging {
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
   border-color: var(--accent);
 }
 
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .card-title {
-  font-size: 14px;
-  color: var(--text-h);
+  font-size: 13.5px;
+  color: var(--ink);
   word-break: break-word;
+  line-height: 1.4;
+}
+
+.grip {
+  width: 10px;
+  height: 16px;
+  color: var(--text-dim);
+  opacity: 0.5;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .card-footer {
@@ -122,37 +172,41 @@
 }
 
 .card-hours {
-  font-size: 12px;
+  font-family: var(--serif);
+  font-size: 13px;
   font-weight: 600;
-  opacity: 0.7;
+  color: var(--text);
 }
 
 .card .remove-btn {
   border: none;
   background: transparent;
-  color: var(--text);
-  opacity: 0.4;
+  color: var(--text-dim);
   font-size: 14px;
   line-height: 1;
   padding: 2px 6px;
   border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
 }
 
 .card .remove-btn:hover {
-  opacity: 1;
   color: var(--expense);
+  background: var(--accent-soft);
 }
 
 .backlog-graph {
   margin-top: 28px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
 }
 
 .backlog-graph h2 {
-  font-size: 16px;
+  font-family: var(--sans);
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--ink);
   margin: 0 0 16px;
 }

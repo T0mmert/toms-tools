@@ -5,8 +5,8 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import './BudgetPage.css';
 
 const CATEGORY_COLORS = [
-  '#6366f1', '#ec4899', '#f59e0b', '#10b981',
-  '#3b82f6', '#ef4444', '#8b5cf6', '#14b8a6',
+  '#0d9488', '#f2c94c', '#b8462f', '#6b6650',
+  '#7c9c8f', '#c98a4b', '#4a5a6b', '#9b6b8e',
 ];
 
 const EMPTY_FORM = { type: 'expense', category: '', description: '', amount: '' };
@@ -55,6 +55,11 @@ function BudgetPage() {
 
   return (
     <div className="budget-page">
+      <div className="page-header">
+        <span className="page-eyebrow">Overzicht</span>
+        <h1>Budget</h1>
+      </div>
+
       <div className="budget-summary">
         <div className="summary-card income">
           <span className="summary-label">Inkomsten</span>

@@ -1,20 +1,35 @@
 :root {
-  --text: #4b5563;
-  --text-h: #08060d;
-  --bg: #f7f7fb;
+  --bg: #f6f3ec;
   --surface: #ffffff;
-  --border: #e5e4e7;
-  --accent: #6d28d9;
-  --accent-bg: rgba(109, 40, 217, 0.1);
-  --income: #10b981;
-  --expense: #ef4444;
-  --shadow:
-    rgba(0, 0, 0, 0.06) 0 1px 2px, rgba(0, 0, 0, 0.05) 0 4px 12px;
+  --surface-alt: #faf7f0;
+  --border: #e6e0d1;
+  --ink: #211f19;
+  --text: #726c5c;
+  --text-dim: #8f8a79;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --accent: #0d9488;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(13, 148, 136, 0.12);
+  --amber: #f2c94c;
+  --amber-soft: rgba(242, 201, 76, 0.18);
+
+  --income: #1a7a4c;
+  --expense: #b8462f;
+
+  --sidebar-bg: #1c2521;
+  --sidebar-text: #d7dcd6;
+  --sidebar-text-dim: #7f8b84;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+
+  --shadow-sm: 0 1px 2px rgba(33, 31, 25, 0.06);
+  --shadow-md: 0 6px 20px -6px rgba(33, 31, 25, 0.16), 0 2px 6px rgba(33, 31, 25, 0.06);
+
+  --radius: 14px;
+  --sans: 'Inter', system-ui, 'Segoe UI', sans-serif;
+  --serif: 'Fraunces', 'Iowan Old Style', ui-serif, Georgia, serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 16px/145% var(--sans);
+  font: 16px/150% var(--sans);
   color-scheme: light dark;
   color: var(--text);
   background: var(--bg);
@@ -26,17 +41,30 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #121218;
-    --surface: #1b1c24;
-    --border: #2e303a;
-    --accent: #a78bfa;
-    --accent-bg: rgba(167, 139, 250, 0.15);
-    --income: #34d399;
+    --bg: #15161a;
+    --surface: #1d1f24;
+    --surface-alt: #23252b;
+    --border: #2d2f36;
+    --ink: #f1efe8;
+    --text: #a3a094;
+    --text-dim: #726f64;
+
+    --accent: #2dd4c2;
+    --accent-ink: #0d1a17;
+    --accent-soft: rgba(45, 212, 194, 0.14);
+    --amber: #f2c94c;
+    --amber-soft: rgba(242, 201, 76, 0.14);
+
+    --income: #4ade80;
     --expense: #f87171;
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 1px 2px, rgba(0, 0, 0, 0.3) 0 4px 12px;
+
+    --sidebar-bg: #101312;
+    --sidebar-text: #d7dcd6;
+    --sidebar-text-dim: #6c766f;
+    --sidebar-border: rgba(255, 255, 255, 0.06);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 10px 24px -8px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -49,8 +77,10 @@ body {
 }
 
 h1, h2, h3 {
-  color: var(--text-h);
+  font-family: var(--serif);
+  color: var(--ink);
   font-weight: 600;
+  margin: 0;
 }
 
 button {
@@ -60,4 +90,19 @@ button {
 
 input {
   font: inherit;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
 }
