@@ -3,6 +3,7 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { v4 as uuid } from 'uuid';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { formatDuration, todayISO } from '../lib/format';
 import './ScrumBoard.css';
 
 const INITIAL_BOARD = {
@@ -16,8 +17,6 @@ const INITIAL_BOARD = {
   },
 };
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
-
 const COLUMN_ACCENTS = {
   backlog: '#8f8a79',
   todo: '#f2c94c',
@@ -26,16 +25,6 @@ const COLUMN_ACCENTS = {
 };
 
 const IDLE_TIMER = { cardId: null, startedAt: null };
-
-function formatDuration(totalSeconds) {
-  const s = Math.max(0, Math.round(totalSeconds));
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  if (h > 0) return `${h}u ${String(m).padStart(2, '0')}m`;
-  if (m > 0) return `${m}m ${String(sec).padStart(2, '0')}s`;
-  return `${sec}s`;
-}
 
 function CardTimer({ trackedSeconds, isRunning, startedAt, onToggle }) {
   const [, forceTick] = useState(0);

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { v4 as uuid } from 'uuid';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { formatCurrency as currency, nextOccurrence } from '../lib/format';
 import './BudgetPage.css';
 
 const CATEGORY_COLORS = [
@@ -10,12 +11,19 @@ const CATEGORY_COLORS = [
 ];
 
 const EMPTY_FORM = { type: 'expense', category: '', description: '', amount: '' };
+const EMPTY_RECURRING_FORM = { name: '', amount: '', day: '' };
 
-const currency = (n) => n.toLocaleString('nl-NL', { style: 'currency', currency: 'EUR' });
+function daysUntil(date) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.round((date - today) / 86400000);
+}
 
 function BudgetPage() {
   const [entries, setEntries] = useLocalStorage('toms-tools:budget', []);
+  const [recurring, setRecurring] = useLocalStorage('toms-tools:recurring', []);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [recurringForm, setRecurringForm] = useState(EMPTY_RECURRING_FORM);
 
   const totals = useMemo(() => {
     const income = entries.filter((e) => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
@@ -51,6 +59,26 @@ function BudgetPage() {
 
   function removeEntry(id) {
     setEntries((prev) => prev.filter((e) => e.id !== id));
+  }
+
+  const upcomingRecurring = useMemo(() => {
+    return recurring
+      .map((r) => ({ ...r, next: nextOccurrence(r.day) }))
+      .sort((a, b) => a.next - b.next);
+  }, [recurring]);
+
+  function handleAddRecurring(e) {
+    e.preventDefault();
+    const amount = parseFloat(recurringForm.amount);
+    const day = parseInt(recurringForm.day, 10);
+    if (!recurringForm.name.trim() || Number.isNaN(amount) || amount <= 0) return;
+    if (Number.isNaN(day) || day < 1 || day > 31) return;
+    setRecurring((prev) => [...prev, { id: uuid(), name: recurringForm.name.trim(), amount, day }]);
+    setRecurringForm(EMPTY_RECURRING_FORM);
+  }
+
+  function removeRecurring(id) {
+    setRecurring((prev) => prev.filter((r) => r.id !== id));
   }
 
   return (
@@ -183,6 +211,65 @@ function BudgetPage() {
             </table>
           )}
         </div>
+      </div>
+
+      <div className="recurring-panel">
+        <h2>Terugkerende kosten</h2>
+        <form className="recurring-form" onSubmit={handleAddRecurring}>
+          <input
+            type="text"
+            placeholder="Naam (bijv. Netflix)"
+            value={recurringForm.name}
+            onChange={(e) => setRecurringForm((f) => ({ ...f, name: e.target.value }))}
+            required
+          />
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="Bedrag"
+            value={recurringForm.amount}
+            onChange={(e) => setRecurringForm((f) => ({ ...f, amount: e.target.value }))}
+            required
+          />
+          <input
+            type="number"
+            min="1"
+            max="31"
+            placeholder="Dag v/d maand"
+            value={recurringForm.day}
+            onChange={(e) => setRecurringForm((f) => ({ ...f, day: e.target.value }))}
+            required
+          />
+          <button type="submit">Toevoegen</button>
+        </form>
+
+        {upcomingRecurring.length === 0 ? (
+          <p className="empty-state">Nog geen terugkerende kosten toegevoegd.</p>
+        ) : (
+          <ul className="recurring-list">
+            {upcomingRecurring.map((r) => {
+              const days = daysUntil(r.next);
+              return (
+                <li key={r.id}>
+                  <span className="recurring-name">{r.name}</span>
+                  <span className="recurring-due">
+                    {days === 0 ? 'Vandaag' : days === 1 ? 'Morgen' : `Over ${days} dagen`}
+                  </span>
+                  <span className="recurring-amount">{currency(r.amount)}</span>
+                  <button
+                    type="button"
+                    className="remove-btn"
+                    onClick={() => removeRecurring(r.id)}
+                    aria-label="Verwijderen"
+                  >
+                    ×
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
     </div>
   );
