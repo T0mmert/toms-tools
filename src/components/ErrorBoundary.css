@@ -1,0 +1,80 @@
+.crash-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg);
+}
+
+.crash-card {
+  max-width: 520px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 28px;
+}
+
+.crash-card h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.crash-card p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.crash-detail {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px 12px;
+  margin: 0 0 20px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.crash-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.crash-btn {
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+
+.crash-btn:hover {
+  border-color: var(--text-dim);
+}
+
+.crash-btn.primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--surface);
+}
+
+.crash-btn.danger {
+  color: var(--expense);
+  border-color: var(--expense);
+}
+
+.crash-btn.primary:hover,
+.crash-btn.danger:hover {
+  opacity: 0.85;
+}

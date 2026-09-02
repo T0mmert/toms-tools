@@ -1,9 +1,15 @@
 <!doctype html>
-<html lang="en">
+<html lang="nl">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Toms Tools — persoonlijk dashboard met budget, scrum board, doelen, gewoontes en notities. Alles blijft lokaal in je browser."
+    />
+    <meta name="theme-color" content="#f6f3ec" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#15161a" media="(prefers-color-scheme: dark)" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -14,10 +20,13 @@
   </head>
   <body>
     <script>
+      // Applied before first paint so an explicit light/dark choice never
+      // flashes the opposite theme on load.
       try {
         var storedTheme = JSON.parse(localStorage.getItem('toms-tools:theme'));
         if (storedTheme === 'light' || storedTheme === 'dark') {
           document.documentElement.setAttribute('data-theme', storedTheme);
+          document.documentElement.style.colorScheme = storedTheme;
         }
       } catch (e) {}
     </script>

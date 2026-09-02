@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { useLocalStorage } from './useLocalStorage';
+import { KEYS } from '../lib/schema';
+import { useStore } from './useStore';
 
 export function useTheme() {
-  const [theme, setTheme] = useLocalStorage('toms-tools:theme', 'system');
+  const [theme, setTheme] = useStore(KEYS.theme);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -11,6 +12,8 @@ export function useTheme() {
     } else {
       root.removeAttribute('data-theme');
     }
+    // Keep the browser UI (address bar, form controls) in step with the choice.
+    root.style.colorScheme = theme === 'system' ? 'light dark' : theme;
   }, [theme]);
 
   return [theme, setTheme];

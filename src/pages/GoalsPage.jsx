@@ -1,28 +1,44 @@
 import { useState } from 'react';
-import { v4 as uuid } from 'uuid';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useStore } from '../hooks/useStore';
+import { createId } from '../lib/id';
+import { KEYS } from '../lib/schema';
 import './GoalsPage.css';
 
 const EMPTY_FORM = { title: '', target: '', unit: '' };
 
 function GoalsPage() {
-  const [goals, setGoals] = useLocalStorage('toms-tools:goals', []);
+  const [goals, setGoals] = useStore(KEYS.goals);
   const [form, setForm] = useState(EMPTY_FORM);
+  // Holds what is literally typed in a progress field while it is being edited,
+  // so the value can be cleared and retyped without snapping back to 0.
+  const [drafts, setDrafts] = useState({});
 
   function handleSubmit(e) {
     e.preventDefault();
     const target = parseFloat(form.target);
-    if (!form.title.trim() || Number.isNaN(target) || target <= 0) return;
+    const title = form.title.trim();
+    if (!title || !Number.isFinite(target) || target <= 0) return;
+
     setGoals((prev) => [
       ...prev,
-      { id: uuid(), title: form.title.trim(), unit: form.unit.trim(), target, current: 0 },
+      { id: createId(), title, unit: form.unit.trim(), target, current: 0 },
     ]);
     setForm(EMPTY_FORM);
   }
 
-  function updateCurrent(id, value) {
-    const current = parseFloat(value);
-    setGoals((prev) => prev.map((g) => (g.id === id ? { ...g, current: Number.isNaN(current) ? 0 : current } : g)));
+  function handleCurrentChange(id, raw) {
+    setDrafts((prev) => ({ ...prev, [id]: raw }));
+    const parsed = parseFloat(raw);
+    if (!Number.isFinite(parsed)) return;
+    setGoals((prev) => prev.map((g) => (g.id === id ? { ...g, current: Math.max(0, parsed) } : g)));
+  }
+
+  function handleCurrentBlur(id) {
+    setDrafts((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
   }
 
   function removeGoal(id) {
@@ -40,6 +56,7 @@ function GoalsPage() {
         <input
           type="text"
           placeholder="Doel (bijv. Spaardoel vakantie)"
+          aria-label="Naam van het doel"
           value={form.title}
           onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
           required
@@ -49,6 +66,7 @@ function GoalsPage() {
           step="0.01"
           min="0"
           placeholder="Streefwaarde"
+          aria-label="Streefwaarde"
           value={form.target}
           onChange={(e) => setForm((f) => ({ ...f, target: e.target.value }))}
           required
@@ -56,6 +74,7 @@ function GoalsPage() {
         <input
           type="text"
           placeholder="Eenheid (€, u, x)"
+          aria-label="Eenheid"
           value={form.unit}
           onChange={(e) => setForm((f) => ({ ...f, unit: e.target.value }))}
         />
@@ -67,7 +86,8 @@ function GoalsPage() {
       ) : (
         <div className="goals-list">
           {goals.map((goal) => {
-            const pct = goal.target > 0 ? Math.min(100, Math.round((goal.current / goal.target) * 100)) : 0;
+            const raw = goal.target > 0 ? (goal.current / goal.target) * 100 : 0;
+            const pct = Math.max(0, Math.min(100, Math.round(raw)));
             const complete = pct >= 100;
             return (
               <div className={`goal-card${complete ? ' complete' : ''}`} key={goal.id}>
@@ -77,12 +97,19 @@ function GoalsPage() {
                     type="button"
                     className="remove-btn"
                     onClick={() => removeGoal(goal.id)}
-                    aria-label="Verwijderen"
+                    aria-label={`Verwijder ${goal.title}`}
                   >
                     ×
                   </button>
                 </div>
-                <div className="goal-bar-track">
+                <div
+                  className="goal-bar-track"
+                  role="progressbar"
+                  aria-valuenow={pct}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`Voortgang ${goal.title}`}
+                >
                   <div className="goal-bar-fill" style={{ width: `${pct}%` }} />
                 </div>
                 <div className="goal-meta">
@@ -90,8 +117,11 @@ function GoalsPage() {
                     <input
                       type="number"
                       step="0.01"
-                      value={goal.current}
-                      onChange={(e) => updateCurrent(goal.id, e.target.value)}
+                      min="0"
+                      aria-label={`Huidige waarde voor ${goal.title}`}
+                      value={drafts[goal.id] ?? goal.current}
+                      onChange={(e) => handleCurrentChange(goal.id, e.target.value)}
+                      onBlur={() => handleCurrentBlur(goal.id)}
                     />
                     <span>
                       / {goal.target} {goal.unit}

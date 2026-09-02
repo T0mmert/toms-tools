@@ -174,10 +174,16 @@
   opacity: 0.85;
 }
 
+/* Narrow screens scroll the ledger rather than squeezing the whole page. */
+.table-scroll {
+  overflow-x: auto;
+}
+
 .entry-list table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13.5px;
+  min-width: 420px;
 }
 
 .entry-list th {
@@ -241,12 +247,29 @@
   box-shadow: var(--shadow-sm);
 }
 
+.recurring-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
 .recurring-panel h2 {
   font-size: 15.5px;
   font-family: var(--sans);
   font-weight: 600;
   color: var(--ink);
-  margin: 0 0 16px;
+  margin: 0;
+}
+
+.recurring-total {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
 }
 
 .recurring-form {
@@ -324,8 +347,17 @@
 
 .recurring-due {
   color: var(--text-dim);
-  font-size: 12.5px;
+  font-size: 12px;
+  font-weight: 600;
   white-space: nowrap;
+  background: var(--surface-alt);
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.recurring-due.soon {
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .recurring-amount {

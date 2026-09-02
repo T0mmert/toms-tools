@@ -1,13 +1,15 @@
-import { useState } from 'react';
-import DataControls from './components/DataControls';
-import ThemeToggle from './components/ThemeToggle';
-import BudgetPage from './pages/BudgetPage';
+import { Suspense, lazy, useState } from 'react';
+import Sidebar from './components/Sidebar';
 import DashboardPage from './pages/DashboardPage';
 import GoalsPage from './pages/GoalsPage';
 import HabitsPage from './pages/HabitsPage';
 import NotesPage from './pages/NotesPage';
-import ScrumBoard from './pages/ScrumBoard';
 import './App.css';
+
+// Budget and the Scrum board pull in the charting library; keeping them out of
+// the initial bundle roughly halves what the dashboard has to download.
+const BudgetPage = lazy(() => import('./pages/BudgetPage'));
+const ScrumBoard = lazy(() => import('./pages/ScrumBoard'));
 
 const TABS = [
   {
@@ -66,7 +68,12 @@ const TABS = [
           strokeWidth="1.5"
           strokeLinejoin="round"
         />
-        <path d="M6.8 12.2c-.3.6-.5 1.3-.5 2a3.7 3.7 0 0 0 7.4 0c0-.9-.3-1.7-.7-2.3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path
+          d="M6.8 12.2c-.3.6-.5 1.3-.5 2a3.7 3.7 0 0 0 7.4 0c0-.9-.3-1.7-.7-2.3"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
       </svg>
     ),
   },
@@ -87,48 +94,21 @@ function App() {
 
   return (
     <div className="app-shell">
-      <aside className="sidebar">
-        <div className="brand">
-          <span className="brand-mark">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="3" y="10" width="3.4" height="7" rx="1" fill="#f2c94c" />
-              <rect x="8.3" y="5.5" width="3.4" height="11.5" rx="1" fill="#0d9488" />
-              <rect x="13.6" y="8" width="3.4" height="9" rx="1" fill="#f6f3ec" />
-            </svg>
-          </span>
-          <span className="brand-name">
-            Toms <em>Tools</em>
-          </span>
-        </div>
+      <a className="skip-link" href="#main-content">
+        Naar hoofdinhoud
+      </a>
 
-        <nav className="tab-nav">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              className={`tab-btn${activeTab === tab.id ? ' active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <span className="tab-icon">{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+      <Sidebar tabs={TABS} activeTab={activeTab} onSelect={setActiveTab} />
 
-        <div className="sidebar-bottom">
-          <ThemeToggle />
-          <DataControls />
-          <div className="sidebar-footer">Data stays in this browser</div>
-        </div>
-      </aside>
-
-      <main className="app-main">
-        {activeTab === 'dashboard' && <DashboardPage />}
-        {activeTab === 'budget' && <BudgetPage />}
-        {activeTab === 'notes' && <NotesPage />}
-        {activeTab === 'goals' && <GoalsPage />}
-        {activeTab === 'habits' && <HabitsPage />}
-        {activeTab === 'scrum' && <ScrumBoard />}
+      <main className="app-main" id="main-content" tabIndex={-1}>
+        <Suspense fallback={<p className="page-loading">Laden…</p>}>
+          {activeTab === 'dashboard' && <DashboardPage onNavigate={setActiveTab} />}
+          {activeTab === 'scrum' && <ScrumBoard />}
+          {activeTab === 'budget' && <BudgetPage />}
+          {activeTab === 'goals' && <GoalsPage />}
+          {activeTab === 'habits' && <HabitsPage />}
+          {activeTab === 'notes' && <NotesPage />}
+        </Suspense>
       </main>
     </div>
   );

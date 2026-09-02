@@ -1,7 +1,44 @@
-export const todayISO = () => new Date().toISOString().slice(0, 10);
+/**
+ * Local-calendar date key (YYYY-MM-DD).
+ *
+ * Deliberately NOT toISOString(): that converts to UTC first, so for a user in
+ * CEST anything logged between 00:00 and 02:00 local would be stamped with the
+ * previous day. Habit streaks, budget entries and backlog history all key off
+ * this, so it has to follow the user's own calendar.
+ */
+export function toLocalISO(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+export const todayISO = () => toLocalISO();
+
+/** Parse a YYYY-MM-DD key back into a local-midnight Date. */
+export function fromLocalISO(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+export function startOfToday() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+export function addDays(date, amount) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + amount);
+  return d;
+}
 
 export function formatCurrency(n) {
   return n.toLocaleString('nl-NL', { style: 'currency', currency: 'EUR' });
+}
+
+export function formatShortDate(iso) {
+  return fromLocalISO(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
 }
 
 export function formatDuration(totalSeconds) {
@@ -18,15 +55,25 @@ export function daysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
 }
 
+/** Next calendar occurrence of a day-of-month, clamped for short months. */
 export function nextOccurrence(dayOfMonth, from = new Date()) {
   const y = from.getFullYear();
   const m = from.getMonth();
   const today = new Date(y, m, from.getDate());
-  const thisMonthDay = Math.min(dayOfMonth, daysInMonth(y, m));
-  const thisMonthDate = new Date(y, m, thisMonthDay);
+  const thisMonthDate = new Date(y, m, Math.min(dayOfMonth, daysInMonth(y, m)));
   if (thisMonthDate >= today) return thisMonthDate;
-  const nextMonthIndex = m === 11 ? 0 : m + 1;
-  const nextMonthYear = m === 11 ? y + 1 : y;
-  const nextMonthDay = Math.min(dayOfMonth, daysInMonth(nextMonthYear, nextMonthIndex));
-  return new Date(nextMonthYear, nextMonthIndex, nextMonthDay);
+
+  const nextMonth = m === 11 ? 0 : m + 1;
+  const nextYear = m === 11 ? y + 1 : y;
+  return new Date(nextYear, nextMonth, Math.min(dayOfMonth, daysInMonth(nextYear, nextMonth)));
+}
+
+export function daysUntil(date) {
+  return Math.round((date - startOfToday()) / 86400000);
+}
+
+export function formatRelativeDays(days) {
+  if (days <= 0) return 'Vandaag';
+  if (days === 1) return 'Morgen';
+  return `Over ${days} dagen`;
 }

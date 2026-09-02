@@ -1,65 +1,44 @@
 import { useState } from 'react';
-import { v4 as uuid } from 'uuid';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useStore } from '../hooks/useStore';
 import { todayISO } from '../lib/format';
+import { completedToday, computeStreak, last7Days } from '../lib/habits';
+import { createId } from '../lib/id';
+import { KEYS } from '../lib/schema';
 import './HabitsPage.css';
 
-const DAY_LABELS = ['Z', 'M', 'D', 'W', 'D', 'V', 'Z'];
-
-function last7Days() {
-  const days = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    days.push({ date: d.toISOString().slice(0, 10), label: DAY_LABELS[d.getDay()] });
-  }
-  return days;
-}
-
-function computeStreak(doneDates) {
-  const set = new Set(doneDates);
-  const cursor = new Date();
-  if (!set.has(cursor.toISOString().slice(0, 10))) {
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  let streak = 0;
-  while (set.has(cursor.toISOString().slice(0, 10))) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return streak;
-}
-
 function HabitsPage() {
-  const [habits, setHabits] = useLocalStorage('toms-tools:habits', []);
+  const [habits, setHabits] = useStore(KEYS.habits);
   const [title, setTitle] = useState('');
+
   const days = last7Days();
   const today = todayISO();
+  const doneToday = completedToday(habits);
 
   function addHabit(e) {
     e.preventDefault();
-    if (!title.trim()) return;
-    setHabits((prev) => [...prev, { id: uuid(), title: title.trim(), doneDates: [] }]);
+    const name = title.trim();
+    if (!name) return;
+    setHabits((prev) => [...prev, { id: createId(), title: name, doneDates: [] }]);
     setTitle('');
   }
 
   function toggleDate(habitId, date) {
     setHabits((prev) =>
-      prev.map((h) =>
-        h.id === habitId
+      prev.map((habit) =>
+        habit.id === habitId
           ? {
-              ...h,
-              doneDates: h.doneDates.includes(date)
-                ? h.doneDates.filter((d) => d !== date)
-                : [...h.doneDates, date],
+              ...habit,
+              doneDates: habit.doneDates.includes(date)
+                ? habit.doneDates.filter((d) => d !== date)
+                : [...habit.doneDates, date],
             }
-          : h,
+          : habit,
       ),
     );
   }
 
   function removeHabit(id) {
-    setHabits((prev) => prev.filter((h) => h.id !== id));
+    setHabits((prev) => prev.filter((habit) => habit.id !== id));
   }
 
   return (
@@ -69,10 +48,17 @@ function HabitsPage() {
         <h1>Habits</h1>
       </div>
 
+      {habits.length > 0 && (
+        <p className="habits-today">
+          Vandaag <strong>{doneToday}</strong> van {habits.length} afgevinkt
+        </p>
+      )}
+
       <form className="habit-form" onSubmit={addHabit}>
         <input
           type="text"
           placeholder="Nieuwe gewoonte (bijv. 30 min sporten)"
+          aria-label="Naam van de gewoonte"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
@@ -93,7 +79,7 @@ function HabitsPage() {
                   <div className="habit-top-right">
                     {streak > 0 && (
                       <span className="habit-streak">
-                        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
                           <path
                             d="M10 2.5c1.2 2 3.2 4.1 3.2 7a3.2 3.2 0 0 1-6.4 0c0-.9.3-1.6.7-2.2.1 1 .8 1.7 1.5 1.5.6-.2.7-1 .3-1.7C8.4 5.8 9.4 4 10 2.5Z"
                             stroke="currentColor"
@@ -108,7 +94,7 @@ function HabitsPage() {
                       type="button"
                       className="remove-btn"
                       onClick={() => removeHabit(habit.id)}
-                      aria-label="Verwijderen"
+                      aria-label={`Verwijder ${habit.title}`}
                     >
                       ×
                     </button>
@@ -124,10 +110,9 @@ function HabitsPage() {
                         className={`habit-day${done ? ' done' : ''}${date === today ? ' today' : ''}`}
                         onClick={() => toggleDate(habit.id, date)}
                         aria-pressed={done}
-                        aria-label={`${date}${done ? ' voltooid' : ' niet voltooid'}`}
-                        title={date}
+                        aria-label={`${habit.title} op ${date}: ${done ? 'voltooid' : 'niet voltooid'}`}
                       >
-                        {label}
+                        <span aria-hidden="true">{label}</span>
                       </button>
                     );
                   })}

@@ -178,12 +178,35 @@
   color: var(--text);
 }
 
+.column-empty {
+  margin: auto;
+  padding: 8px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  text-align: center;
+  opacity: 0.75;
+}
+
 .card-timer {
   display: flex;
   align-items: center;
   gap: 8px;
   padding-top: 8px;
   border-top: 1px solid var(--border);
+}
+
+.timer-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  margin-left: auto;
+  animation: timer-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes timer-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
 }
 
 .timer-toggle {

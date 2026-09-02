@@ -15,6 +15,13 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  text-align: left;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .stat-label {
@@ -37,7 +44,13 @@
   color: var(--expense);
 }
 
-.up-next {
+.dashboard-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.panel {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -45,41 +58,88 @@
   box-shadow: var(--shadow-sm);
 }
 
-.up-next h2 {
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.panel-head h2 {
   font-family: var(--sans);
   font-size: 15.5px;
   font-weight: 600;
   color: var(--ink);
-  margin: 0 0 14px;
 }
 
-.up-next-list {
+.panel-link {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 6px;
+}
+
+.panel-link:hover {
+  text-decoration: underline;
+}
+
+.panel-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
 }
 
-.up-next-list li {
+.panel-list li {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 10px;
   padding: 10px 0;
   border-bottom: 1px solid var(--border);
   font-size: 14px;
   color: var(--text);
 }
 
-.up-next-list li:last-child {
+.panel-list li:last-child {
   border-bottom: none;
 }
 
-.up-next-hours {
+.panel-item-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.panel-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: var(--surface-alt);
+  color: var(--text-dim);
+}
+
+.panel-tag.todo {
+  background: var(--amber-soft);
+  color: var(--amber-ink);
+}
+
+.panel-tag.due.soon {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.panel-item-meta {
   font-family: var(--serif);
   font-weight: 600;
   color: var(--text-dim);
   flex-shrink: 0;
-  margin-left: 12px;
+  font-variant-numeric: tabular-nums;
 }
