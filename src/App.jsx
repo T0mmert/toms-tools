@@ -1,5 +1,7 @@
-import { Suspense, lazy, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
+import CommandPalette from './components/CommandPalette';
 import Sidebar from './components/Sidebar';
+import SyncPanel from './components/SyncPanel';
 import DashboardPage from './pages/DashboardPage';
 import GoalsPage from './pages/GoalsPage';
 import HabitsPage from './pages/HabitsPage';
@@ -91,6 +93,19 @@ const TABS = [
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [syncOpen, setSyncOpen] = useState(false);
+
+  useEffect(() => {
+    function onKey(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setPaletteOpen((open) => !open);
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   return (
     <div className="app-shell">
@@ -98,7 +113,13 @@ function App() {
         Naar hoofdinhoud
       </a>
 
-      <Sidebar tabs={TABS} activeTab={activeTab} onSelect={setActiveTab} />
+      <Sidebar
+        tabs={TABS}
+        activeTab={activeTab}
+        onSelect={setActiveTab}
+        onOpenSearch={() => setPaletteOpen(true)}
+        onOpenSync={() => setSyncOpen(true)}
+      />
 
       <main className="app-main" id="main-content" tabIndex={-1}>
         <Suspense fallback={<p className="page-loading">Laden…</p>}>
@@ -110,6 +131,11 @@ function App() {
           {activeTab === 'notes' && <NotesPage />}
         </Suspense>
       </main>
+
+      {paletteOpen && (
+        <CommandPalette onClose={() => setPaletteOpen(false)} onNavigate={setActiveTab} />
+      )}
+      {syncOpen && <SyncPanel onClose={() => setSyncOpen(false)} />}
     </div>
   );
 }

@@ -4,6 +4,12 @@ import { KEYS, STORES, STORAGE_PREFIX, matchesKind } from './schema';
 const BACKUP_VERSION = 1;
 const KNOWN_KEYS = Object.values(KEYS);
 
+// Sync settings hold an access token. Backups get shared and synced around, so
+// the credential is deliberately kept out of them — and out of anything the
+// sync endpoint receives.
+const PRIVATE_KEYS = new Set([KEYS.sync]);
+export const SYNCABLE_KEYS = KNOWN_KEYS.filter((key) => !PRIVATE_KEYS.has(key));
+
 /**
  * Snapshot of every known store. Only schema-known keys are included, so a
  * backup never carries quarantined debris or keys from another app sharing
@@ -11,7 +17,7 @@ const KNOWN_KEYS = Object.values(KEYS);
  */
 export function collectData() {
   const data = {};
-  KNOWN_KEYS.forEach((key) => {
+  SYNCABLE_KEYS.forEach((key) => {
     try {
       const raw = localStorage.getItem(key);
       if (raw !== null) data[key] = raw;
@@ -68,6 +74,13 @@ export function parseBackup(text) {
 
   Object.entries(parsed.data).forEach(([key, raw]) => {
     if (!key.startsWith(STORAGE_PREFIX) || !STORES[key]) {
+      skipped.push(key);
+      return;
+    }
+    // Never let a file configure where data gets sent. Without this, opening
+    // someone else's "backup" could silently point sync at their server and
+    // start uploading everything.
+    if (PRIVATE_KEYS.has(key)) {
       skipped.push(key);
       return;
     }

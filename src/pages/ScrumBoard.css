@@ -274,6 +274,119 @@
   box-shadow: var(--shadow-sm);
 }
 
+.time-report {
+  margin-top: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+.report-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.report-head h2 {
+  font-family: var(--sans);
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.report-total {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.estimate-table {
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.estimate-table h3 {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+
+.estimate-table ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.estimate-table li {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(60px, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.estimate-name {
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.estimate-bar {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  overflow: hidden;
+}
+
+.estimate-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.estimate-fill.over {
+  background: var(--expense);
+}
+
+.estimate-figures {
+  font-family: var(--serif);
+  font-weight: 600;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.estimate-figures.over {
+  color: var(--expense);
+}
+
+@media (max-width: 520px) {
+  .estimate-table li {
+    grid-template-columns: 1fr auto;
+  }
+
+  .estimate-bar {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+}
+
 .backlog-graph h2 {
   font-family: var(--sans);
   font-size: 15.5px;

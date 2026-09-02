@@ -1,3 +1,61 @@
+.budget-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.month-switch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: var(--shadow-sm);
+}
+
+.month-switch button {
+  min-width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.month-switch button:hover {
+  background: var(--surface-alt);
+  color: var(--ink);
+}
+
+.month-label {
+  min-width: 132px;
+  text-align: center;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  text-transform: capitalize;
+}
+
+.month-today {
+  font-size: 12px !important;
+  font-weight: 600;
+  padding: 0 10px;
+  color: var(--accent) !important;
+}
+
+.entry-note {
+  margin: -6px 0 14px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
 .budget-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

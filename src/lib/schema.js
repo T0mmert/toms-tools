@@ -8,10 +8,12 @@ export const KEYS = {
   board: 'toms-tools:scrum-board',
   history: 'toms-tools:scrum-history',
   timer: 'toms-tools:timer',
+  sessions: 'toms-tools:sessions',
   notes: 'toms-tools:notes',
   goals: 'toms-tools:goals',
   habits: 'toms-tools:habits',
   theme: 'toms-tools:theme',
+  sync: 'toms-tools:sync',
 };
 
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -141,6 +143,31 @@ export const STORES = {
     },
   },
 
+  // One row per completed timer run. The per-card `trackedSeconds` total stays
+  // authoritative for "time on this task"; sessions add the *when*, which is
+  // what any report over time needs.
+  [KEYS.sessions]: {
+    kind: 'array',
+    defaultValue: () => [],
+    normalize(value) {
+      if (!Array.isArray(value)) return [];
+      return value.reduce((out, session) => {
+        if (!isObject(session)) return out;
+        const seconds = num(session.seconds);
+        const date = isoDate(session.date);
+        if (!date || seconds === null || seconds <= 0) return out;
+        out.push({
+          id: str(session.id) || `${date}-${out.length}`,
+          cardId: str(session.cardId),
+          title: str(session.title, 'Naamloze taak'),
+          date,
+          seconds,
+        });
+        return out;
+      }, []);
+    },
+  },
+
   [KEYS.notes]: {
     kind: 'array',
     defaultValue: () => [],
@@ -203,6 +230,22 @@ export const STORES = {
     defaultValue: () => 'system',
     normalize(value) {
       return value === 'light' || value === 'dark' ? value : 'system';
+    },
+  },
+
+  // Sync settings are deliberately empty by default: nothing leaves this
+  // browser until an endpoint is entered by hand.
+  [KEYS.sync]: {
+    kind: 'object',
+    defaultValue: () => ({ endpoint: '', token: '', auto: false, lastSyncedAt: null }),
+    normalize(value) {
+      if (!isObject(value)) return { endpoint: '', token: '', auto: false, lastSyncedAt: null };
+      return {
+        endpoint: str(value.endpoint),
+        token: str(value.token),
+        auto: value.auto === true,
+        lastSyncedAt: num(value.lastSyncedAt),
+      };
     },
   },
 };

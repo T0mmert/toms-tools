@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import DataControls from './DataControls';
 import ThemeToggle from './ThemeToggle';
 
-function Sidebar({ tabs, activeTab, onSelect }) {
+function Sidebar({ tabs, activeTab, onSelect, onOpenSearch, onOpenSync }) {
   const [navOpen, setNavOpen] = useState(false);
 
   // Close the mobile drawer once the viewport is wide enough to show the rail,
@@ -54,6 +54,22 @@ function Sidebar({ tabs, activeTab, onSelect }) {
       </div>
 
       <div className="sidebar-scroll" id="main-nav">
+        <button
+          type="button"
+          className="search-trigger"
+          onClick={() => {
+            onOpenSearch?.();
+            setNavOpen(false);
+          }}
+        >
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="9" cy="9" r="5.5" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M13.2 13.2L17 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+          Zoeken
+          <kbd>Ctrl K</kbd>
+        </button>
+
         <nav className="tab-nav" aria-label="Hoofdnavigatie">
           {tabs.map((tab) => (
             <button
@@ -73,7 +89,7 @@ function Sidebar({ tabs, activeTab, onSelect }) {
 
         <div className="sidebar-bottom">
           <ThemeToggle />
-          <DataControls />
+          <DataControls onOpenSync={onOpenSync} />
           <p className="sidebar-footer">Data stays in this browser</p>
         </div>
       </div>

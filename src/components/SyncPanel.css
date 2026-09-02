@@ -1,0 +1,156 @@
+.sync-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(20, 18, 14, 0.45);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 10vh 16px 16px;
+  backdrop-filter: blur(2px);
+}
+
+.sync-dialog {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 22px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.sync-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.sync-head h2 {
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.sync-close {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.sync-close:hover {
+  color: var(--ink);
+  background: var(--surface-alt);
+}
+
+.sync-intro {
+  margin: 0 0 18px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.sync-field {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.sync-field span {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.sync-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-alt);
+  color: var(--ink);
+}
+
+.sync-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.sync-warning {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--amber-soft);
+  color: var(--amber-ink);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.sync-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.sync-btn {
+  padding: 9px 15px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+
+.sync-btn:hover:not(:disabled) {
+  border-color: var(--text-dim);
+}
+
+.sync-btn.primary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--surface);
+}
+
+.sync-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sync-status {
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+
+.sync-status.ok {
+  color: var(--income);
+}
+
+.sync-status.error {
+  color: var(--expense);
+}
+
+.sync-meta,
+.sync-note {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.sync-note {
+  margin-top: 8px;
+}

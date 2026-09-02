@@ -22,7 +22,7 @@ const ICONS = {
   ),
 };
 
-function DataControls() {
+function DataControls({ onOpenSync }) {
   const fileRef = useRef(null);
   const [status, setStatus] = useState(null);
 
@@ -74,6 +74,14 @@ function DataControls() {
           {ICONS.import}
         </svg>
         Importeren
+      </button>
+      <button type="button" className="data-btn" onClick={() => onOpenSync?.()}>
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M3.5 8.5a6.5 6.5 0 0 1 11-3.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M16.5 11.5a6.5 6.5 0 0 1-11 3.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M14.5 2.5v3h-3M5.5 17.5v-3h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        Synchroniseren
       </button>
       <button type="button" className="data-btn danger" onClick={handleReset}>
         <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

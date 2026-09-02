@@ -4,9 +4,12 @@ import { useStore } from '../hooks/useStore';
 import {
   daysUntil,
   formatCurrency,
+  formatMonth,
   formatRelativeDays,
   formatShortDate,
   nextOccurrence,
+  shiftMonth,
+  toMonthKey,
   todayISO,
 } from '../lib/format';
 import { createId } from '../lib/id';
@@ -26,22 +29,31 @@ function BudgetPage() {
   const [recurring, setRecurring] = useStore(KEYS.recurring);
   const [form, setForm] = useState(EMPTY_FORM);
   const [recurringForm, setRecurringForm] = useState(EMPTY_RECURRING);
+  const [month, setMonth] = useState(() => toMonthKey());
+
+  // Everything above the ledger is scoped to the selected month; all-time
+  // totals stop meaning much once a few months of data build up.
+  const monthEntries = useMemo(
+    () => entries.filter((e) => e.date && e.date.startsWith(month)),
+    [entries, month],
+  );
+  const undatedCount = useMemo(() => entries.filter((e) => !e.date).length, [entries]);
 
   const totals = useMemo(() => {
-    const income = entries.filter((e) => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
-    const expenses = entries.filter((e) => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+    const income = monthEntries.filter((e) => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
+    const expenses = monthEntries.filter((e) => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
     return { income, expenses, balance: income - expenses };
-  }, [entries]);
+  }, [monthEntries]);
 
   const categoryData = useMemo(() => {
     const map = new Map();
-    entries
+    monthEntries
       .filter((e) => e.type === 'expense')
       .forEach((e) => map.set(e.category, (map.get(e.category) || 0) + e.amount));
     return [...map]
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
-  }, [entries]);
+  }, [monthEntries]);
 
   const upcoming = useMemo(
     () => recurring.map((r) => ({ ...r, next: nextOccurrence(r.day) })).sort((a, b) => a.next - b.next),
@@ -95,9 +107,25 @@ function BudgetPage() {
 
   return (
     <div className="budget-page">
-      <div className="page-header">
-        <span className="page-eyebrow">Overzicht</span>
-        <h1>Budget</h1>
+      <div className="page-header budget-header">
+        <div>
+          <span className="page-eyebrow">Overzicht</span>
+          <h1>Budget</h1>
+        </div>
+        <div className="month-switch">
+          <button type="button" onClick={() => setMonth((m) => shiftMonth(m, -1))} aria-label="Vorige maand">
+            ‹
+          </button>
+          <span className="month-label">{formatMonth(month)}</span>
+          <button type="button" onClick={() => setMonth((m) => shiftMonth(m, 1))} aria-label="Volgende maand">
+            ›
+          </button>
+          {month !== toMonthKey() && (
+            <button type="button" className="month-today" onClick={() => setMonth(toMonthKey())}>
+              Nu
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="budget-summary">
@@ -203,8 +231,14 @@ function BudgetPage() {
 
         <div className="entry-list">
           <h2>Boekingen</h2>
-          {entries.length === 0 ? (
-            <p className="empty-state">Nog geen boekingen toegevoegd.</p>
+          {undatedCount > 0 && (
+            <p className="entry-note">
+              {undatedCount} {undatedCount === 1 ? 'boeking heeft' : 'boekingen hebben'} geen datum
+              en {undatedCount === 1 ? 'valt' : 'vallen'} buiten dit maandoverzicht.
+            </p>
+          )}
+          {monthEntries.length === 0 ? (
+            <p className="empty-state">Geen boekingen in {formatMonth(month)}.</p>
           ) : (
             <div className="table-scroll">
               <table>
@@ -218,7 +252,7 @@ function BudgetPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...entries].reverse().map((entry) => (
+                  {[...monthEntries].reverse().map((entry) => (
                     <tr key={entry.id} className={entry.type}>
                       <td>{entry.date ? formatShortDate(entry.date) : '—'}</td>
                       <td>{entry.description}</td>

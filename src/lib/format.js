@@ -68,6 +68,22 @@ export function nextOccurrence(dayOfMonth, from = new Date()) {
   return new Date(nextYear, nextMonth, Math.min(dayOfMonth, daysInMonth(nextYear, nextMonth)));
 }
 
+/** Month key (YYYY-MM) for grouping, in local time. */
+export function toMonthKey(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+export function shiftMonth(monthKey, delta) {
+  const [y, m] = monthKey.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  return toMonthKey(d);
+}
+
+export function formatMonth(monthKey) {
+  const [y, m] = monthKey.split('-').map(Number);
+  return new Date(y, m - 1, 1).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
+}
+
 export function daysUntil(date) {
   return Math.round((date - startOfToday()) / 86400000);
 }

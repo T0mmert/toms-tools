@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import TimeReport from '../components/TimeReport';
 import { useStore } from '../hooks/useStore';
 import { COLUMN_ACCENTS, columnHours, remainingHours } from '../lib/board';
 import { formatDuration, formatShortDate, todayISO } from '../lib/format';
@@ -53,6 +54,7 @@ function ScrumBoard() {
   const [board, setBoard] = useStore(KEYS.board);
   const [history, setHistory] = useStore(KEYS.history);
   const [activeTimer, setActiveTimer] = useStore(KEYS.timer);
+  const [sessions, setSessions] = useStore(KEYS.sessions);
   const [newCard, setNewCard] = useState({ title: '', hours: '' });
 
   const outstanding = useMemo(() => remainingHours(board), [board]);
@@ -109,6 +111,22 @@ function ScrumBoard() {
         },
       };
     });
+
+    // Log the run itself so time can be reported per day, not just as a
+    // running total. Sub-second blips are noise, so they are not recorded.
+    if (elapsed < 1) return;
+    const card = board.cards[cardId];
+    if (!card) return;
+    setSessions((prev) => [
+      ...prev,
+      {
+        id: createId(),
+        cardId,
+        title: card.title,
+        date: todayISO(),
+        seconds: Math.round(elapsed),
+      },
+    ]);
   }
 
   function toggleTimer(cardId) {
@@ -336,6 +354,8 @@ function ScrumBoard() {
           </ResponsiveContainer>
         )}
       </div>
+
+      <TimeReport board={board} sessions={sessions} />
     </div>
   );
 }
