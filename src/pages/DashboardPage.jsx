@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import DashboardAtmosphere from '../components/DashboardAtmosphere';
+import LiquidGlassFilter from '../components/LiquidGlassFilter';
 import NewsCard from '../components/NewsCard';
 import WeatherCard from '../components/WeatherCard';
 import { useStore } from '../hooks/useStore';
@@ -115,6 +116,7 @@ function DashboardPage({ onNavigate }) {
   return (
     <div className="dashboard-page">
       <DashboardAtmosphere />
+      <LiquidGlassFilter />
 
       <div className="dashboard-content">
         <div className="page-header">

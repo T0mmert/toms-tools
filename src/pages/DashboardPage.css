@@ -45,15 +45,48 @@
  * hold what's specific to them — kept here since Dashboard is the only place
  * that currently renders either.
  */
+/*
+ * Liquid glass. Three things sell it, in order of how much they matter:
+ *  1. the backdrop is saturated and brightened, the way real glass amplifies
+ *     what is behind it rather than just blurring it;
+ *  2. a thick bevel — bright along the top/left, dark along the bottom/right —
+ *     so the card reads as a slab with depth instead of a flat pane;
+ *  3. an edge ring (::after) that refracts harder than the middle, because a
+ *     bevel bends far more light than the flat centre does.
+ */
 .widget-card {
   position: relative;
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  box-shadow: var(--glass-shadow);
+  /* The displacement map's centre is neutral grey, so the warp confines
+     itself to the bevel and the middle stays optically straight — no ring
+     element needed. Chromium applies the url() filter; Safari and Firefox
+     ignore it and keep the blur/saturate. */
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.7) brightness(1.06) url(#liquid-glass);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.7) brightness(1.06);
+  border: none;
+  border-radius: 24px;
   padding: 18px 20px;
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 0 0 1px var(--glass-edge),
+    inset 0 3px 2px -2px var(--glass-bevel-light),
+    inset 3px 0 3px -3px var(--glass-bevel-light),
+    inset 0 -3px 3px -2px var(--glass-bevel-dark),
+    inset -3px 0 3px -3px var(--glass-bevel-dark),
+    inset 0 0 14px -6px var(--glass-bevel-light);
+}
+
+/* Specular glints: a hard one off the top-left corner, a softer bounce
+   returning from the bottom-right. */
+.widget-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(138deg, var(--glass-glint) 0%, transparent 26%),
+    linear-gradient(318deg, var(--glass-glint-soft) 0%, transparent 22%);
 }
 
 .widget-head {
