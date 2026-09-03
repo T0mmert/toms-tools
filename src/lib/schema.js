@@ -15,6 +15,7 @@ export const KEYS = {
   theme: 'toms-tools:theme',
   sync: 'toms-tools:sync',
   location: 'toms-tools:location',
+  calendar: 'toms-tools:calendar',
 };
 
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -263,6 +264,19 @@ export const STORES = {
         auto: value.auto === true,
         lastSyncedAt: num(value.lastSyncedAt),
       };
+    },
+  },
+
+  // Only the OAuth Client ID is persisted — it isn't secret (Google's own
+  // docs ship it in client-side code) and unlike the sync token it grants
+  // nothing by itself. The access token it's used to obtain lives only in
+  // CalendarCard's own state for the life of the tab.
+  [KEYS.calendar]: {
+    kind: 'object',
+    defaultValue: () => ({ clientId: '' }),
+    normalize(value) {
+      if (!isObject(value)) return { clientId: '' };
+      return { clientId: str(value.clientId) };
     },
   },
 };

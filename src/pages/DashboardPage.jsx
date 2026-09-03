@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import CalendarCard from '../components/CalendarCard';
 import DashboardAtmosphere from '../components/DashboardAtmosphere';
 import LiquidGlassFilter from '../components/LiquidGlassFilter';
 import NewsCard from '../components/NewsCard';
@@ -140,6 +141,7 @@ function DashboardPage({ onNavigate }) {
         </div>
 
         <div className="dashboard-panels">
+          <CalendarCard />
           <WeatherCard />
           <NewsCard />
 
