@@ -14,6 +14,7 @@ export const KEYS = {
   habits: 'toms-tools:habits',
   theme: 'toms-tools:theme',
   sync: 'toms-tools:sync',
+  location: 'toms-tools:location',
 };
 
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -230,6 +231,22 @@ export const STORES = {
     defaultValue: () => 'system',
     normalize(value) {
       return value === 'light' || value === 'dark' ? value : 'system';
+    },
+  },
+
+  // The city the weather widget shows. Empty by default — nothing is
+  // requested until the user picks a place.
+  [KEYS.location]: {
+    kind: 'object',
+    defaultValue: () => null,
+    normalize(value) {
+      if (!isObject(value)) return null;
+      const lat = num(value.lat);
+      const lon = num(value.lon);
+      const name = str(value.name);
+      if (lat === null || lon === null || !name) return null;
+      if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+      return { name, lat, lon };
     },
   },
 

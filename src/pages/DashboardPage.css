@@ -1,3 +1,140 @@
+.dashboard-page {
+  position: relative;
+}
+
+/*
+ * Fixed to the viewport rather than the page, so it stays put while the
+ * dashboard's widgets scroll over it. Positioned to start exactly where the
+ * sidebar ends (--sidebar-width, defined in App.css) — on desktop that means
+ * it never overlaps the sidebar at all, so no z-index tug-of-war is needed;
+ * on mobile the sidebar collapses to a bar above it and covers it with its
+ * own opaque background.
+ */
+.dashboard-atmosphere {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width, 232px);
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-size: cover;
+  background-position: center 38%;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 899px) {
+  .dashboard-atmosphere {
+    left: 0;
+  }
+}
+
+.dashboard-content {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-content .page-eyebrow {
+  color: var(--atmosphere-glow);
+}
+
+/*
+ * Shared glass-card surface. WeatherCard and NewsCard rely on these
+ * widget-* classes too (.widget-card / .widget-head / .widget-link /
+ * .widget-skeleton / .widget-error) even though their own stylesheets only
+ * hold what's specific to them — kept here since Dashboard is the only place
+ * that currently renders either.
+ */
+.widget-card {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+  padding: 18px 20px;
+}
+
+.widget-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.widget-head h2 {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.widget-link {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.widget-link:hover {
+  text-decoration: underline;
+}
+
+.widget-skeleton {
+  height: 90px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--surface-alt) 25%, var(--border) 50%, var(--surface-alt) 75%);
+  background-size: 200% 100%;
+  animation: widget-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes widget-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.widget-error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.widget-error-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.widget-retry {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 8px;
+}
+
+.widget-retry:hover {
+  border-color: var(--text-dim);
+}
+
+.widget-error-actions a {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Stat tiles */
+
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -6,22 +143,33 @@
 }
 
 .stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 16px 18px;
-  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: flex-start;
+  gap: 8px;
   text-align: left;
-  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .stat-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.stat-icon svg {
+  width: 17px;
+  height: 17px;
 }
 
 .stat-label {
@@ -44,47 +192,12 @@
   color: var(--expense);
 }
 
+/* Panel grid (tasks / bills / weather / news) */
+
 .dashboard-panels {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
-}
-
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 22px;
-  box-shadow: var(--shadow-sm);
-}
-
-.panel-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.panel-head h2 {
-  font-family: var(--sans);
-  font-size: 15.5px;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.panel-link {
-  border: none;
-  background: transparent;
-  color: var(--accent);
-  font-size: 12.5px;
-  font-weight: 600;
-  padding: 2px 4px;
-  border-radius: 6px;
-}
-
-.panel-link:hover {
-  text-decoration: underline;
 }
 
 .panel-list {
@@ -143,3 +256,4 @@
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
 }
+

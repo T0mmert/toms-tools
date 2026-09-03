@@ -88,6 +88,17 @@ export function daysUntil(date) {
   return Math.round((date - startOfToday()) / 86400000);
 }
 
+export function formatRelativeTime(timestamp) {
+  if (!timestamp) return '';
+  const diffMinutes = Math.round((Date.now() - timestamp) / 60000);
+  if (diffMinutes < 1) return 'zojuist';
+  if (diffMinutes < 60) return `${diffMinutes}m geleden`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}u geleden`;
+  const diffDays = Math.round(diffHours / 24);
+  return `${diffDays}d geleden`;
+}
+
 export function formatRelativeDays(days) {
   if (days <= 0) return 'Vandaag';
   if (days === 1) return 'Morgen';
