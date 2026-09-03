@@ -1,5 +1,6 @@
 import { todayISO } from './format';
 import { KEYS, STORES, STORAGE_PREFIX, matchesKind } from './schema';
+import { vaultGet, vaultRemove, vaultSet } from './vault';
 
 const BACKUP_VERSION = 1;
 const KNOWN_KEYS = Object.values(KEYS);
@@ -18,12 +19,10 @@ export const SYNCABLE_KEYS = KNOWN_KEYS.filter((key) => !PRIVATE_KEYS.has(key));
 export function collectData() {
   const data = {};
   SYNCABLE_KEYS.forEach((key) => {
-    try {
-      const raw = localStorage.getItem(key);
-      if (raw !== null) data[key] = raw;
-    } catch {
-      // Storage unreadable — skip this key.
-    }
+    // Read decrypted, so a backup file stays a plain readable JSON document
+    // rather than a blob that is worthless without this exact password.
+    const raw = vaultGet(key);
+    if (raw !== null) data[key] = raw;
   });
   return data;
 }
@@ -108,7 +107,7 @@ export function parseBackup(text) {
 }
 
 export function applyBackup(accepted) {
-  Object.entries(accepted).forEach(([key, raw]) => localStorage.setItem(key, raw));
+  Object.entries(accepted).forEach(([key, raw]) => vaultSet(key, raw));
 }
 
 export function readFileAsText(file) {
@@ -131,11 +130,5 @@ export async function importData(file) {
 }
 
 export function clearAllData() {
-  KNOWN_KEYS.forEach((key) => {
-    try {
-      localStorage.removeItem(key);
-    } catch {
-      // Nothing to do if storage is blocked.
-    }
-  });
+  KNOWN_KEYS.forEach((key) => vaultRemove(key));
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { clearAllData, exportData, importData } from '../lib/storage';
+import { flushWrites, lock } from '../lib/vault';
 
 const ICONS = {
   export: (
@@ -52,6 +53,13 @@ function DataControls({ onOpenSync }) {
     }
   }
 
+  async function handleLock() {
+    // Let any in-flight encrypted write finish before the key is dropped,
+    // otherwise the last edit would never reach storage.
+    await flushWrites();
+    lock();
+  }
+
   function handleReset() {
     const confirmed = window.confirm(
       'Alle Toms Tools-gegevens in deze browser worden gewist. Dit kan niet ongedaan worden gemaakt. Doorgaan?',
@@ -82,6 +90,13 @@ function DataControls({ onOpenSync }) {
           <path d="M14.5 2.5v3h-3M5.5 17.5v-3h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         Synchroniseren
+      </button>
+      <button type="button" className="data-btn" onClick={handleLock}>
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="3.5" y="8.5" width="13" height="9" rx="2" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M6.8 8.5V6.5a3.2 3.2 0 0 1 6.4 0v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+        Vergrendelen
       </button>
       <button type="button" className="data-btn danger" onClick={handleReset}>
         <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

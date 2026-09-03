@@ -1,40 +1,40 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getStore } from '../lib/schema';
+import { vaultAdopt, vaultDecryptRaw, vaultGet, vaultSet } from '../lib/vault';
 
-function quarantine(key) {
+function quarantine(key, raw) {
   try {
-    const raw = window.localStorage.getItem(key);
     if (raw !== null) window.localStorage.setItem(`${key}.corrupt`, raw);
   } catch {
     // Storage unavailable — nothing to preserve.
   }
 }
 
-function readStore(key, store) {
-  let raw = null;
-  try {
-    raw = window.localStorage.getItem(key);
-  } catch {
-    return store.defaultValue();
-  }
+function parseStore(key, store, raw) {
   if (raw === null) return store.defaultValue();
-
   try {
     return store.normalize(JSON.parse(raw));
   } catch {
     // Unparseable JSON. Keep a copy under `<key>.corrupt` so the data is
     // recoverable by hand, then carry on with a clean slate rather than
     // throwing during render.
-    quarantine(key);
+    quarantine(key, raw);
     return store.defaultValue();
   }
 }
 
+function readStore(key, store) {
+  return parseStore(key, store, vaultGet(key));
+}
+
 /**
- * Persistent state backed by localStorage, validated through the store schema.
+ * Persistent state backed by the vault, validated through the store schema.
  *
- * Values are normalized on read, so a truncated backup, an older data shape or
- * a hand-edited file degrades to something renderable instead of crashing the
+ * Reads come from the vault's decrypted cache, so they stay synchronous even
+ * though the underlying localStorage records are encrypted; writes go back
+ * through the vault, which re-encrypts them in the background. Values are
+ * normalized on read, so a truncated backup, an older data shape or a
+ * hand-edited file degrades to something renderable instead of crashing the
  * page. Changes made in other tabs are picked up via the `storage` event.
  */
 export function useStore(key) {
@@ -53,23 +53,29 @@ export function useStore(key) {
     }
     if (serialized === lastWritten.current) return;
 
-    try {
-      window.localStorage.setItem(key, serialized);
-      lastWritten.current = serialized;
-    } catch {
-      // Quota exceeded or storage blocked (private mode): state stays in memory
-      // for this session rather than taking the page down.
-    }
+    lastWritten.current = serialized;
+    vaultSet(key, serialized);
   }, [key, value]);
 
   useEffect(() => {
-    function onStorage(event) {
+    let cancelled = false;
+
+    async function onStorage(event) {
       if (event.key !== key) return;
-      lastWritten.current = event.newValue;
-      setValue(readStore(key, getStore(key)));
+      // Another tab wrote ciphertext; decrypt it before adopting, and skip the
+      // write-back so the two tabs cannot ping-pong.
+      const plain = await vaultDecryptRaw(event.newValue);
+      if (cancelled) return;
+      lastWritten.current = plain;
+      vaultAdopt(key, plain);
+      setValue(parseStore(key, getStore(key), plain));
     }
+
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('storage', onStorage);
+    };
   }, [key]);
 
   const update = useCallback((next) => {
