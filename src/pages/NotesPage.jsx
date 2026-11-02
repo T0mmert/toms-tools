@@ -30,9 +30,13 @@ function NotesPage() {
     if (type === 'new-note') focusId.current = addNote();
   });
 
+  // Runs once before the new note has rendered, so keep the id until the
+  // textarea actually exists.
   useEffect(() => {
     if (!focusId.current) return;
-    document.querySelector(`[data-note-id="${focusId.current}"]`)?.focus();
+    const field = document.querySelector(`[data-note-id="${focusId.current}"]`);
+    if (!field) return;
+    field.focus();
     focusId.current = null;
   }, [notes]);
 

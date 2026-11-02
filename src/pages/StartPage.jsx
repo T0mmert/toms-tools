@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import PageIcon from '../components/PageIcon';
 import { useStore } from '../hooks/useStore';
 import { remainingHours } from '../lib/board';
-import { daysUntil, formatHours, nextOccurrence } from '../lib/format';
+import { daysUntil, formatHours, nextOccurrence, toMonthKey } from '../lib/format';
 import { bestStreak } from '../lib/habits';
+import { monthTotals, settleStatuses } from '../lib/hours';
 import { KEYS } from '../lib/schema';
 import './StartPage.css';
 
@@ -18,12 +19,20 @@ function useTileStats() {
   const [goals] = useStore(KEYS.goals);
   const [habits] = useStore(KEYS.habits);
   const [notes] = useStore(KEYS.notes);
+  const [shifts] = useStore(KEYS.hours);
 
   return useMemo(() => {
     const dueSoon = recurring.filter((bill) => daysUntil(nextOccurrence(bill.day)) <= 7).length;
+    const month = toMonthKey();
+    const settled = settleStatuses(shifts);
+    const hours = monthTotals(settled, month);
+    const anyShifts = settled.some((row) => row.date.startsWith(`${month}-`));
     const goalsDone = goals.filter((goal) => goal.current >= goal.target).length;
     const streak = bestStreak(habits);
     return {
+      hours: anyShifts
+        ? `${formatHours(hours.worked)} gewerkt${hours.toConfirm ? `, ${hours.toConfirm} te bevestigen` : ' deze maand'}`
+        : 'Nog geen diensten deze maand',
       scrum: `${formatHours(remainingHours(board))} in backlog`,
       budget: recurring.length
         ? dueSoon
@@ -34,7 +43,7 @@ function useTileStats() {
       habits: habits.length ? `Beste streak: ${plural(streak, 'dag', 'dagen')}` : 'Nog geen gewoontes',
       notes: plural(notes.length, 'notitie', 'notities'),
     };
-  }, [board, recurring, goals, habits, notes]);
+  }, [board, recurring, goals, habits, notes, shifts]);
 }
 
 /** What an empty tab shows: search, quick actions and a tile per page. */

@@ -8,10 +8,13 @@ import {
   daysUntil,
   formatCurrency,
   formatDuration,
+  formatHours,
   formatRelativeDays,
   nextOccurrence,
+  toMonthKey,
 } from '../lib/format';
 import { bestStreak, completedToday } from '../lib/habits';
+import { monthTotals, settleStatuses } from '../lib/hours';
 import { KEYS } from '../lib/schema';
 import './DashboardPage.css';
 
@@ -75,6 +78,13 @@ function DashboardPage({ onNavigate }) {
   const [notes] = useStore(KEYS.notes);
   const [goals] = useStore(KEYS.goals);
   const [habits] = useStore(KEYS.habits);
+  const [shifts] = useStore(KEYS.hours);
+
+  const hours = useMemo(() => {
+    const month = toMonthKey();
+    const settled = settleStatuses(shifts);
+    return { any: settled.some((row) => row.date.startsWith(`${month}-`)), ...monthTotals(settled, month) };
+  }, [shifts]);
 
   const balance = useMemo(() => {
     return entries.reduce((sum, e) => sum + (e.type === 'income' ? e.amount : -e.amount), 0);
@@ -99,6 +109,13 @@ function DashboardPage({ onNavigate }) {
 
   const stats = [
     { tab: 'budget', icon: 'balance', label: 'Saldo', value: formatCurrency(balance), negative: balance < 0 },
+    {
+      tab: 'hours',
+      icon: 'clock',
+      label: 'HB uren (maand)',
+      value: hours.any ? formatHours(hours.worked) : '—',
+      hint: hours.toConfirm > 0 ? `Te bevestigen: ${hours.toConfirm}` : null,
+    },
     { tab: 'scrum', icon: 'backlog', label: 'Backlog uren', value: `${outstanding}u` },
     { tab: 'scrum', icon: 'clock', label: 'Tijd bijgehouden', value: formatDuration(tracked) },
     { tab: 'goals', icon: 'target', label: 'Doelen behaald', value: `${completedGoals}/${goals.length}` },
@@ -131,6 +148,7 @@ function DashboardPage({ onNavigate }) {
               <span className="stat-icon">{ICONS[stat.icon]}</span>
               <span className="stat-label">{stat.label}</span>
               <span className={`stat-value${stat.negative ? ' negative' : ''}`}>{stat.value}</span>
+              {stat.hint && <span className="stat-hint">{stat.hint}</span>}
             </button>
           ))}
         </div>

@@ -24,9 +24,11 @@ import './App.css';
 // the initial bundle roughly halves what the dashboard has to download.
 const BudgetPage = lazy(() => import('./pages/BudgetPage'));
 const ScrumBoard = lazy(() => import('./pages/ScrumBoard'));
+const HoursPage = lazy(() => import('./pages/HoursPage'));
 
 const PAGE_COMPONENTS = {
   dashboard: DashboardPage,
+  hours: HoursPage,
   scrum: ScrumBoard,
   budget: BudgetPage,
   goals: GoalsPage,

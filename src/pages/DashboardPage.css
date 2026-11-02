@@ -157,6 +157,13 @@
   color: var(--expense);
 }
 
+.stat-hint {
+  margin-top: -4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--amber-ink);
+}
+
 /* Panel grid (tasks / bills / weather / news) */
 
 .dashboard-panels {
