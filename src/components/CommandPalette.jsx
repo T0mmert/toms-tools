@@ -4,17 +4,8 @@ import { formatCurrency } from '../lib/format';
 import { KEYS } from '../lib/schema';
 import './CommandPalette.css';
 
-const PAGES = [
-  { tab: 'dashboard', label: 'Dashboard' },
-  { tab: 'scrum', label: 'Scrum Board' },
-  { tab: 'budget', label: 'Budget' },
-  { tab: 'goals', label: 'Goals' },
-  { tab: 'habits', label: 'Habits' },
-  { tab: 'notes', label: 'Notes' },
-];
-
 /** Mounted only while open, so each launch starts from a clean slate. */
-function CommandPalette({ onClose, onNavigate }) {
+function CommandPalette({ pages, actions, onClose, onNavigate }) {
   const [query, setQuery] = useState('');
   const [cursor, setCursor] = useState(0);
   const inputRef = useRef(null);
@@ -26,12 +17,16 @@ function CommandPalette({ onClose, onNavigate }) {
   const [recurring] = useStore(KEYS.recurring);
 
   const items = useMemo(() => {
-    const all = PAGES.map((page) => ({
-      id: `page-${page.tab}`,
-      group: 'Ga naar',
-      label: page.label,
-      tab: page.tab,
+    const all = actions.map((action) => ({
+      id: `action-${action.id}`,
+      group: 'Snel starten',
+      label: action.label,
+      tab: action.page,
+      intent: action.id,
     }));
+    pages.forEach((page) => {
+      all.push({ id: `page-${page.id}`, group: 'Ga naar', label: page.label, tab: page.id });
+    });
 
     Object.values(board.cards).forEach((card) => {
       all.push({
@@ -74,7 +69,7 @@ function CommandPalette({ onClose, onNavigate }) {
       });
     });
     return all;
-  }, [board, notes, goals, habits, recurring]);
+  }, [pages, actions, board, notes, goals, habits, recurring]);
 
   // Group headers are derived here rather than tracked with a mutable variable
   // during render, which would carry state across renders unpredictably.
@@ -82,7 +77,7 @@ function CommandPalette({ onClose, onNavigate }) {
     const q = query.trim().toLowerCase();
     const matches = q
       ? items.filter((item) => item.label.toLowerCase().includes(q)).slice(0, 40)
-      : items.filter((item) => item.group === 'Ga naar');
+      : items.filter((item) => item.group === 'Snel starten' || item.group === 'Ga naar');
 
     return matches.map((item, i) => ({
       ...item,
@@ -110,7 +105,7 @@ function CommandPalette({ onClose, onNavigate }) {
 
   function choose(item) {
     if (!item) return;
-    onNavigate(item.tab);
+    onNavigate(item.tab, item.intent);
     onClose();
   }
 

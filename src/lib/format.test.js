@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, fromLocalISO, shiftMonth, toLocalISO } from './format.js';
+import { addDays, formatEuros, formatHours, fromLocalISO, shiftMonth, toLocalISO } from './format.js';
 
 describe('test environment', () => {
   it('runs in Europe/Amsterdam so DST tests are deterministic', () => {
@@ -26,5 +26,17 @@ describe('format date helpers', () => {
   it('shifts months across a year boundary', () => {
     expect(shiftMonth('2026-12', 1)).toBe('2027-01');
     expect(shiftMonth('2026-01', -1)).toBe('2025-12');
+  });
+});
+
+describe('format numbers', () => {
+  it('writes hours with a decimal comma and at most two decimals', () => {
+    expect(formatHours(6.5)).toBe('6,5u');
+    expect(formatHours(72)).toBe('72u');
+    expect(formatHours(12.333)).toBe('12,33u');
+  });
+
+  it('rounds euros to whole amounts', () => {
+    expect(formatEuros(1454.4).replace(/\s/g, ' ')).toBe('€ 1.454');
   });
 });

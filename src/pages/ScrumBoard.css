@@ -5,6 +5,12 @@
   flex-wrap: wrap;
 }
 
+.board-hint {
+  margin: -12px 0 20px;
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+
 .add-card-form input {
   padding: 10px 12px;
   border: 1px solid var(--border);

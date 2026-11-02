@@ -51,6 +51,16 @@ export function formatDuration(totalSeconds) {
   return `${sec}s`;
 }
 
+/** Hours as Dutch display text: 6.5 -> "6,5u", 72 -> "72u". */
+export function formatHours(hours) {
+  return `${hours.toLocaleString('nl-NL', { maximumFractionDigits: 2 })}u`;
+}
+
+/** Whole euros for summary figures, where cents are noise. */
+export function formatEuros(amount) {
+  return amount.toLocaleString('nl-NL', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+}
+
 export function daysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
 }

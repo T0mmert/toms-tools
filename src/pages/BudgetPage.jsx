@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { useIntent } from '../hooks/useIntent';
 import { useStore } from '../hooks/useStore';
 import {
   daysUntil,
@@ -30,6 +31,16 @@ function BudgetPage() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [recurringForm, setRecurringForm] = useState(EMPTY_RECURRING);
   const [month, setMonth] = useState(() => toMonthKey());
+  const descriptionRef = useRef(null);
+
+  // Quick action "Uitgave toevoegen": preselect an expense and put the cursor
+  // in the form.
+  useIntent('budget', (type) => {
+    if (type !== 'add-expense') return;
+    setForm((f) => ({ ...f, type: 'expense' }));
+    descriptionRef.current?.scrollIntoView({ block: 'center' });
+    descriptionRef.current?.focus({ preventScroll: true });
+  });
 
   // Everything above the ledger is scoped to the selected month; all-time
   // totals stop meaning much once a few months of data build up.
@@ -168,6 +179,7 @@ function BudgetPage() {
               </label>
             </div>
             <input
+              ref={descriptionRef}
               type="text"
               placeholder="Omschrijving"
               aria-label="Omschrijving"

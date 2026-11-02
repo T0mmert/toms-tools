@@ -49,6 +49,27 @@ export const PAGES = [
   },
 ];
 
+/**
+ * Shortcuts on the start page and in the palette. Each opens its page and
+ * sends the action's id as an intent (see intents.js) that the page acts on.
+ */
+export const QUICK_ACTIONS = [
+  { id: 'add-shift', label: 'Dienst toevoegen', page: 'hours', icon: 'M10 4v12M4 10h12' },
+  {
+    id: 'add-expense',
+    label: 'Uitgave toevoegen',
+    page: 'budget',
+    icon: 'M5 2.5h10v15l-2.5-1.5-2.5 1.5-2.5-1.5L5 17.5V2.5ZM8 7h4M8 10.5h4',
+  },
+  { id: 'start-timer', label: 'Timer starten', page: 'scrum', icon: 'M7 5l8 5-8 5V5Z' },
+  {
+    id: 'new-note',
+    label: 'Notitie maken',
+    page: 'notes',
+    icon: 'M5.5 2.5h9a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-11a2 2 0 0 1 2-2ZM6.5 7h7M6.5 10.5h7M6.5 14h4',
+  },
+];
+
 /** Icon for an empty tab that shows the start page. */
 export const START_ICON =
   'M4 3h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM12 3h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM4 11h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1ZM12 11h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1Z';

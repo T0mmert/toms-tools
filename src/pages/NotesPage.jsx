@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+import { useIntent } from '../hooks/useIntent';
 import { useStore } from '../hooks/useStore';
 import { createId } from '../lib/id';
 import { KEYS } from '../lib/schema';
@@ -7,18 +9,32 @@ const NOTE_COLORS = ['amber', 'teal', 'rose', 'sage'];
 
 function NotesPage() {
   const [notes, setNotes] = useStore(KEYS.notes);
+  const focusId = useRef(null);
 
   function addNote() {
+    const id = createId();
     setNotes((prev) => [
       {
-        id: createId(),
+        id,
         text: '',
         color: NOTE_COLORS[prev.length % NOTE_COLORS.length],
         updatedAt: Date.now(),
       },
       ...prev,
     ]);
+    return id;
   }
+
+  // Quick action "Notitie maken": a fresh note, ready to type in.
+  useIntent('notes', (type) => {
+    if (type === 'new-note') focusId.current = addNote();
+  });
+
+  useEffect(() => {
+    if (!focusId.current) return;
+    document.querySelector(`[data-note-id="${focusId.current}"]`)?.focus();
+    focusId.current = null;
+  }, [notes]);
 
   function updateNote(id, text) {
     setNotes((prev) =>
@@ -37,7 +53,7 @@ function NotesPage() {
         <h1>Notes</h1>
       </div>
 
-      <button type="button" className="add-note-btn" onClick={addNote}>
+      <button type="button" className="add-note-btn" onClick={() => addNote()}>
         + Nieuwe notitie
       </button>
 
@@ -48,6 +64,7 @@ function NotesPage() {
           {notes.map((note) => (
             <div className={`note note-${note.color}`} key={note.id}>
               <textarea
+                data-note-id={note.id}
                 value={note.text}
                 placeholder="Typ hier..."
                 aria-label="Notitie"

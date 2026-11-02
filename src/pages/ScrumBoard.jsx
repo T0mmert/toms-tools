@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import TimeReport from '../components/TimeReport';
+import { useIntent } from '../hooks/useIntent';
 import { useStore } from '../hooks/useStore';
 import { COLUMN_ACCENTS, columnHours, remainingHours } from '../lib/board';
 import { formatDuration, formatShortDate, todayISO } from '../lib/format';
@@ -56,6 +57,19 @@ function ScrumBoard() {
   const [activeTimer, setActiveTimer] = useStore(KEYS.timer);
   const [sessions, setSessions] = useStore(KEYS.sessions);
   const [newCard, setNewCard] = useState({ title: '', hours: '' });
+  const [hint, setHint] = useState(null);
+
+  // Quick action "Timer starten": start the first card in To Do, or say why not.
+  useIntent('scrum', (type) => {
+    if (type !== 'start-timer') return;
+    const first = board.columns.todo?.cardIds[0];
+    if (!first) {
+      setHint('Er staat geen kaart in To Do om een timer op te starten.');
+      return;
+    }
+    setHint(null);
+    if (activeTimer.cardId !== first) toggleTimer(first);
+  });
 
   const outstanding = useMemo(() => remainingHours(board), [board]);
   const cardCount = Object.keys(board.cards).length;
@@ -223,6 +237,12 @@ function ScrumBoard() {
         />
         <button type="submit">Toevoegen aan Backlog</button>
       </form>
+
+      {hint && (
+        <p className="board-hint" role="status">
+          {hint}
+        </p>
+      )}
 
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="board">

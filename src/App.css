@@ -301,6 +301,32 @@
   outline: none;
 }
 
+/*
+ * The forest photo behind the glass pages. Fixed to the viewport rather than
+ * the page, so it stays put while content scrolls over it. Positioned to
+ * start exactly where the sidebar ends, so on desktop it never overlaps the
+ * sidebar; on mobile the sidebar collapses to a bar above it and covers it
+ * with its own opaque background.
+ */
+.dashboard-atmosphere {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width, 232px);
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-size: cover;
+  background-position: center 38%;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 899px) {
+  .dashboard-atmosphere {
+    left: 0;
+  }
+}
+
 .page-loading {
   color: var(--text-dim);
   font-size: 14px;
