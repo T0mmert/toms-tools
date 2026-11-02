@@ -6,13 +6,16 @@ import PageIcon from './components/PageIcon';
 import Sidebar from './components/Sidebar';
 import SyncPanel from './components/SyncPanel';
 import TabBar from './components/TabBar';
-import { CalendarProvider } from './hooks/useCalendar';
+import UnreadableBanner from './components/UnreadableBanner';
+import { CalendarProvider, useCalendar } from './hooks/useCalendar';
 import { useStore } from './hooks/useStore';
 import { createId } from './lib/id';
+import { startIdleLock } from './lib/idleLock';
 import { sendIntent } from './lib/intents';
 import { PAGES, QUICK_ACTIONS, getPage } from './lib/pages';
 import { KEYS } from './lib/schema';
 import { addTab, closeTab, openPage, selectTab } from './lib/tabs';
+import { lockAfterFlush } from './lib/vault';
 import DashboardPage from './pages/DashboardPage';
 import GoalsPage from './pages/GoalsPage';
 import HabitsPage from './pages/HabitsPage';
@@ -46,6 +49,10 @@ function AppShell() {
   const [tabs, setTabs] = useStore(KEYS.tabs);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [syncOpen, setSyncOpen] = useState(false);
+  const { idleLockMinutes } = useCalendar().settings;
+
+  // Locking unmounts this whole tree, which also drops every page's state.
+  useEffect(() => startIdleLock({ idleMs: idleLockMinutes * 60_000, onLock: lockAfterFlush }), [idleLockMinutes]);
 
   const activeTab = tabs.open.find((tab) => tab.id === tabs.active) || tabs.open[0];
   const activePage = activeTab.page;
@@ -94,6 +101,7 @@ function AppShell() {
       />
 
       <main className="app-main" id="main-content" tabIndex={-1}>
+        <UnreadableBanner />
         <TabBar
           tabs={tabs}
           onSelect={(id) => setTabs((prev) => selectTab(prev, id))}

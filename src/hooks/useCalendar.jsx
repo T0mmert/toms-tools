@@ -1,6 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { loadGis, requestAccessToken, revokeToken } from '../lib/googleAuth';
 import { KEYS } from '../lib/schema';
+import { isUnlocked, onLockChange } from '../lib/vault';
 import { useStore } from './useStore';
 
 const CalendarContext = createContext(null);
@@ -15,13 +16,29 @@ const CalendarContext = createContext(null);
  * through this one keeps them in step.
  *
  * The access token lives only in this provider's state: never persisted, and
- * gone when the app unmounts on lock or the tab closes.
+ * revoked (best effort) the moment the vault locks, so a locked app holds no
+ * live Google access either.
  */
 export function CalendarProvider({ children }) {
   const [settings, setSettings] = useStore(KEYS.calendar);
   const [accessToken, setAccessToken] = useState(null);
   const [connecting, setConnecting] = useState(false);
+  const tokenRef = useRef(null);
   const { clientId } = settings;
+
+  useEffect(() => {
+    tokenRef.current = accessToken;
+  }, [accessToken]);
+
+  useEffect(
+    () =>
+      onLockChange(() => {
+        if (isUnlocked() || !tokenRef.current) return;
+        revokeToken(tokenRef.current).catch(() => {});
+        tokenRef.current = null;
+      }),
+    [],
+  );
 
   // As soon as a Client ID exists, load the GIS script ahead of time and try
   // a silent reconnect. Loading it eagerly (rather than inside the Connect

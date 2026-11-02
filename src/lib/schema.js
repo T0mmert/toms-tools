@@ -22,13 +22,17 @@ export const KEYS = {
   hours: 'toms-tools:hours',
 };
 
-/** Hours settings live beside the Client ID; all are editable on the Uren page. */
+/**
+ * App settings that live beside the Client ID: the hours settings (edited on
+ * the Uren page) and the idle-lock delay (edited in the sidebar).
+ */
 export const CALENDAR_DEFAULTS = {
   clientId: '',
   shiftTitle: 'HB Werk',
   hourlyRate: 18.7,
   vakantiegeldPct: 8,
   breakMinutes: 0,
+  idleLockMinutes: 5,
 };
 
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -300,6 +304,7 @@ export const STORES = {
         hourlyRate: inRange(value.hourlyRate, 0, 1000) ?? d.hourlyRate,
         vakantiegeldPct: inRange(value.vakantiegeldPct, 0, 100) ?? d.vakantiegeldPct,
         breakMinutes: inRange(value.breakMinutes, 0, 600) ?? d.breakMinutes,
+        idleLockMinutes: inRange(value.idleLockMinutes, 1, 30) ?? d.idleLockMinutes,
       };
     },
   },

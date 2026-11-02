@@ -2,22 +2,20 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getStore } from '../lib/schema';
 import { vaultAdopt, vaultDecryptRaw, vaultGet, vaultSet } from '../lib/vault';
 
+// The raw value is already decrypted at this point, so the copy goes back
+// through the vault: sealed like everything else, never plaintext on disk.
 function quarantine(key, raw) {
-  try {
-    if (raw !== null) window.localStorage.setItem(`${key}.corrupt`, raw);
-  } catch {
-    // Storage unavailable — nothing to preserve.
-  }
+  if (raw !== null) vaultSet(`${key}.corrupt`, raw);
 }
 
-function parseStore(key, store, raw) {
+export function parseStore(key, store, raw) {
   if (raw === null) return store.defaultValue();
   try {
     return store.normalize(JSON.parse(raw));
   } catch {
-    // Unparseable JSON. Keep a copy under `<key>.corrupt` so the data is
-    // recoverable by hand, then carry on with a clean slate rather than
-    // throwing during render.
+    // Unparseable JSON. Keep an encrypted copy under `<key>.corrupt` so the
+    // data is not lost outright, then carry on with a clean slate rather
+    // than throwing during render.
     quarantine(key, raw);
     return store.defaultValue();
   }

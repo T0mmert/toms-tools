@@ -290,6 +290,186 @@
   color: #f19a9a;
 }
 
+.data-status.info {
+  color: var(--sidebar-text);
+}
+
+.data-btn.subtle {
+  padding: 6px 8px;
+  font-size: 11.5px;
+  opacity: 0.8;
+}
+
+.data-lock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 8px 6px 32px;
+  font-size: 12px;
+  color: var(--sidebar-text-dim);
+}
+
+.data-lock select {
+  border: 1px solid var(--sidebar-border);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--sidebar-text);
+  font: inherit;
+  padding: 3px 6px;
+}
+
+.data-lock select option {
+  color: #211f19;
+}
+
+/* Inline password for a backup made under an earlier password. Used in the
+   dark sidebar and on the light banner, so it takes its colours from context. */
+.backup-password {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px;
+}
+
+.backup-password label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.backup-password input {
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.backup-password-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.backup-password-actions button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.backup-password-actions button[type='submit'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.backup-password-actions button:disabled {
+  opacity: 0.5;
+}
+
+/* Unreadable data after a password change. Solid, not glass: it is a warning
+   that has to read clearly on any page. */
+.unreadable-banner {
+  margin: 0 0 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--amber);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-md);
+}
+
+.unreadable-banner h2 {
+  margin-bottom: 6px;
+  font-family: var(--sans);
+  font-size: 15px;
+}
+
+.unreadable-banner p {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.unreadable-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.unreadable-btn {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-alt);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.unreadable-btn.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.unreadable-btn.danger {
+  border-color: var(--expense);
+  background: var(--expense);
+  color: #ffffff;
+}
+
+.unreadable-btn:disabled {
+  opacity: 0.5;
+}
+
+.unreadable-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.unreadable-confirm label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.unreadable-confirm input {
+  max-width: 260px;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+.unreadable-status {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+  font-size: 12.5px;
+}
+
+.unreadable-status.error {
+  color: var(--expense);
+}
+
 .app-main {
   flex: 1;
   min-width: 0;

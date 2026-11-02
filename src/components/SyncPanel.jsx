@@ -110,7 +110,8 @@ function SyncPanel({ onClose }) {
             onClick={() =>
               run(pullData, (r) => {
                 setTimeout(() => window.location.reload(), 800);
-                return `${r.imported} onderdelen opgehaald. Herladen…`;
+                const resealed = r.resealed ? ' De oude onversleutelde kopie op de server is vervangen.' : '';
+                return `${r.imported} onderdelen opgehaald.${resealed} Herladen…`;
               })
             }
           >
@@ -131,8 +132,9 @@ function SyncPanel({ onClose }) {
         )}
 
         <p className="sync-note">
-          Ophalen overschrijft de gegevens in deze browser. Het token wordt lokaal opgeslagen en
-          nooit meegenomen in een back-upbestand.
+          De server ontvangt alleen versleutelde gegevens; zonder je wachtwoord kan hij ze niet
+          lezen. Ophalen overschrijft de gegevens in deze browser. Het token wordt lokaal opgeslagen
+          en nooit meegenomen in een back-upbestand.
         </p>
       </div>
     </div>
