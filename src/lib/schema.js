@@ -1,4 +1,5 @@
 import { COLUMN_ORDER, COLUMN_TITLES, emptyBoard } from './board';
+import { defaultTabs, normalizeTabs } from './tabs';
 
 export const STORAGE_PREFIX = 'toms-tools:';
 
@@ -16,6 +17,7 @@ export const KEYS = {
   sync: 'toms-tools:sync',
   location: 'toms-tools:location',
   calendar: 'toms-tools:calendar',
+  tabs: 'toms-tools:tabs',
 };
 
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -278,6 +280,14 @@ export const STORES = {
       if (!isObject(value)) return { clientId: '' };
       return { clientId: str(value.clientId) };
     },
+  },
+
+  // Open tabs and the active one. Rules live in tabs.js so they are testable
+  // without React.
+  [KEYS.tabs]: {
+    kind: 'object',
+    defaultValue: defaultTabs,
+    normalize: (value) => normalizeTabs(value),
   },
 };
 
