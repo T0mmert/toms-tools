@@ -1,44 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useStore } from '../hooks/useStore';
+import { useCalendar } from '../hooks/useCalendar';
 import { fetchUpcomingEvents } from '../lib/calendar';
 import { daysUntil, formatRelativeDays } from '../lib/format';
-import { loadGis, requestAccessToken, revokeToken } from '../lib/googleAuth';
-import { KEYS } from '../lib/schema';
 import './CalendarCard.css';
 
 function CalendarCard() {
-  const [settings, setSettings] = useStore(KEYS.calendar);
+  const { settings, setSettings, accessToken, connecting, connect, disconnect, expire } = useCalendar();
   const [editing, setEditing] = useState(!settings.clientId);
   const [draftClientId, setDraftClientId] = useState(settings.clientId);
 
-  const [accessToken, setAccessToken] = useState(null);
   const [events, setEvents] = useState(null);
   const [error, setError] = useState(null);
-  const [connecting, setConnecting] = useState(false);
-
-  // As soon as a Client ID exists, load the GIS script ahead of time and try
-  // a silent reconnect. Loading it eagerly (rather than inside the Connect
-  // click handler) matters: the gap an awaited script load would add between
-  // the click and the actual popup risks Safari treating the popup as not
-  // directly user-initiated and blocking it.
-  useEffect(() => {
-    if (!settings.clientId) return undefined;
-    let cancelled = false;
-
-    loadGis().catch(() => {});
-    requestAccessToken({ clientId: settings.clientId, interactive: false })
-      .then(({ accessToken: token }) => {
-        if (!cancelled) setAccessToken(token);
-      })
-      .catch(() => {
-        // Expected the first time a Client ID is saved, or once a prior
-        // session has expired — not an error worth showing.
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [settings.clientId]);
 
   useEffect(() => {
     if (!accessToken) return undefined;
@@ -53,7 +25,7 @@ function CalendarCard() {
       .catch((err) => {
         if (cancelled) return;
         if (err.code === 'auth') {
-          setAccessToken(null);
+          expire();
           setError({ type: 'expired', text: 'Je sessie is verlopen.' });
         } else {
           setError({ type: 'generic', text: err.message });
@@ -63,31 +35,19 @@ function CalendarCard() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken]);
+  }, [accessToken, expire]);
 
   async function handleConnect() {
-    setConnecting(true);
     setError(null);
     try {
-      const { accessToken: token } = await requestAccessToken({
-        clientId: settings.clientId,
-        interactive: true,
-      });
-      setAccessToken(token);
+      await connect();
     } catch (err) {
       setError({ type: 'generic', text: err.message });
-    } finally {
-      setConnecting(false);
     }
   }
 
   async function handleDisconnect() {
-    try {
-      await revokeToken(accessToken);
-    } catch {
-      // Local state is cleared regardless — see module docs in googleAuth.js.
-    }
-    setAccessToken(null);
+    await disconnect();
     setEvents(null);
     setError(null);
   }

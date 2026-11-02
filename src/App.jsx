@@ -6,6 +6,7 @@ import PageIcon from './components/PageIcon';
 import Sidebar from './components/Sidebar';
 import SyncPanel from './components/SyncPanel';
 import TabBar from './components/TabBar';
+import { CalendarProvider } from './hooks/useCalendar';
 import { useStore } from './hooks/useStore';
 import { createId } from './lib/id';
 import { sendIntent } from './lib/intents';
@@ -39,7 +40,7 @@ const AVAILABLE_PAGES = PAGES.filter((page) => PAGE_COMPONENTS[page.id]);
 const AVAILABLE_ACTIONS = QUICK_ACTIONS.filter((action) => PAGE_COMPONENTS[action.page]);
 const NAV = AVAILABLE_PAGES.map((page) => ({ id: page.id, label: page.label, icon: <PageIcon d={page.icon} /> }));
 
-function App() {
+function AppShell() {
   const [tabs, setTabs] = useStore(KEYS.tabs);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [syncOpen, setSyncOpen] = useState(false);
@@ -122,6 +123,14 @@ function App() {
       )}
       {syncOpen && <SyncPanel onClose={() => setSyncOpen(false)} />}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <CalendarProvider>
+      <AppShell />
+    </CalendarProvider>
   );
 }
 
