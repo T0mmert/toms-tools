@@ -9,9 +9,10 @@ const KNOWN_KEYS = Object.values(KEYS);
 // the credential is deliberately kept out of them — and out of anything the
 // sync endpoint receives.
 //
-// KEYS.calendar is deliberately NOT in this set: it only ever holds a Google
-// OAuth Client ID, which isn't a secret and grants nothing by itself — the
-// access token it's used to request is never persisted at all.
+// KEYS.calendar is deliberately NOT in this set: it holds a Google OAuth
+// Client ID, which isn't a secret and grants nothing by itself, and the hours
+// settings. The access token the Client ID is used to request is never
+// persisted at all.
 const PRIVATE_KEYS = new Set([KEYS.sync]);
 export const SYNCABLE_KEYS = KNOWN_KEYS.filter((key) => !PRIVATE_KEYS.has(key));
 

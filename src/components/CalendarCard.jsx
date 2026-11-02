@@ -94,7 +94,8 @@ function CalendarCard() {
 
   function handleSaveSettings(e) {
     e.preventDefault();
-    setSettings({ clientId: draftClientId.trim() });
+    // Merge: the same store holds the hours settings.
+    setSettings((prev) => ({ ...prev, clientId: draftClientId.trim() }));
     setEditing(false);
   }
 

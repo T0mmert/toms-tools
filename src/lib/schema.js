@@ -1,4 +1,5 @@
 import { COLUMN_ORDER, COLUMN_TITLES, emptyBoard } from './board';
+import { normalizeShifts } from './hours';
 import { defaultTabs, normalizeTabs } from './tabs';
 
 export const STORAGE_PREFIX = 'toms-tools:';
@@ -18,12 +19,26 @@ export const KEYS = {
   location: 'toms-tools:location',
   calendar: 'toms-tools:calendar',
   tabs: 'toms-tools:tabs',
+  hours: 'toms-tools:hours',
+};
+
+/** Hours settings live beside the Client ID; all are editable on the Uren page. */
+export const CALENDAR_DEFAULTS = {
+  clientId: '',
+  shiftTitle: 'HB Werk',
+  hourlyRate: 18.7,
+  vakantiegeldPct: 8,
+  breakMinutes: 0,
 };
 
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
 const str = (v, fallback = '') => (typeof v === 'string' ? v : fallback);
 const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
 const isoDate = (v) => (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null);
+const inRange = (v, min, max) => {
+  const n = num(v);
+  return n !== null && n >= min && n <= max ? n : null;
+};
 
 /**
  * Every store normalizes rather than rejects: anything recognisable is kept and
@@ -269,16 +284,23 @@ export const STORES = {
     },
   },
 
-  // Only the OAuth Client ID is persisted — it isn't secret (Google's own
-  // docs ship it in client-side code) and unlike the sync token it grants
-  // nothing by itself. The access token it's used to obtain lives only in
-  // CalendarCard's own state for the life of the tab.
+  // The OAuth Client ID plus the hours settings. The Client ID isn't secret
+  // (Google's own docs ship it in client-side code) and unlike the sync token
+  // it grants nothing by itself. The access token it's used to obtain lives
+  // only in memory (useCalendar) for the life of the tab.
   [KEYS.calendar]: {
     kind: 'object',
-    defaultValue: () => ({ clientId: '' }),
+    defaultValue: () => ({ ...CALENDAR_DEFAULTS }),
     normalize(value) {
-      if (!isObject(value)) return { clientId: '' };
-      return { clientId: str(value.clientId) };
+      if (!isObject(value)) return { ...CALENDAR_DEFAULTS };
+      const d = CALENDAR_DEFAULTS;
+      return {
+        clientId: str(value.clientId),
+        shiftTitle: str(value.shiftTitle).trim() || d.shiftTitle,
+        hourlyRate: inRange(value.hourlyRate, 0, 1000) ?? d.hourlyRate,
+        vakantiegeldPct: inRange(value.vakantiegeldPct, 0, 100) ?? d.vakantiegeldPct,
+        breakMinutes: inRange(value.breakMinutes, 0, 600) ?? d.breakMinutes,
+      };
     },
   },
 
@@ -288,6 +310,13 @@ export const STORES = {
     kind: 'object',
     defaultValue: defaultTabs,
     normalize: (value) => normalizeTabs(value),
+  },
+
+  // Worked-hours log (HB shifts). Rules live in hours.js.
+  [KEYS.hours]: {
+    kind: 'array',
+    defaultValue: () => [],
+    normalize: normalizeShifts,
   },
 };
 
