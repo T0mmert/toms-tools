@@ -4,6 +4,9 @@ import ErrorBoundary from './components/ErrorBoundary.jsx'
 import LoginGate from './components/LoginGate.jsx'
 import './index.css'
 import App from './App.jsx'
+import { watchForUpdates } from './lib/swUpdate.js'
+
+watchForUpdates()
 
 // LoginGate sits above App rather than inside it: until the vault is open there
 // is no decryption key, so every store would read empty. Not mounting App at
